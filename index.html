@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Telas do Passado — Sloto-Verse Deluxe</title>
+<style>
+  :root {
+    --bg-deep: #140508;
+    --bg-panel: #240910;
+    --bg-card: #1c070c;
+    --gold: #ffd700;
+    --gold-bright: #fff099;
+    --gold-dim: #b8860b;
+    --ivory: #fff8e7;
+    --muted: #e2c799;
+    --accent: #ff3b5c;
+    --green: #22c55e;
+    --border-gold: rgba(255, 215, 0, 0.45);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(circle at top, #360c17 0%, var(--bg-deep) 75%);
+    color: var(--ivory);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.4;
+  }
+
+  /* TELA INICIAL (SPLASH) */
+  #splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: radial-gradient(circle at center, #3b0d19 0%, #0d0305 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    transition: opacity 0.4s ease;
+  }
+
+  #splash-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .logo-box {
+    border: 2px solid var(--gold);
+    background: linear-gradient(180deg, rgba(45,10,18,0.95), rgba(20,4,8,0.98));
+    border-radius: 18px;
+    padding: 20px 28px;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    max-width: 440px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .brand-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.75rem, 6vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.45);
+    margin-top: 8px;
+  }
+
+  .brand-sub {
+    font-size: 0.9rem;
+    letter-
