@@ -24,7 +24,6 @@
   }
   #fx-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 80; }
 
-  /* SPLASH SCREEN */
   #splash-screen {
     position: fixed; inset: 0; z-index: 100;
     background: radial-gradient(circle at center, #420d1b 0%, #0b0204 100%);
@@ -55,10 +54,8 @@
   }
   .btn-primary:active { transform: scale(0.96); }
 
-  /* CONTAINER */
   .app-container { max-width: 780px; margin: 0 auto; padding: 12px 12px 32px; display: flex; flex-direction: column; gap: 11px; }
 
-  /* HEADER */
   .top-header {
     background: linear-gradient(90deg, #290811, #1c050b); border: 1px solid var(--border-gold);
     border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
@@ -73,7 +70,6 @@
   }
   .btn-icon.glow { border-color: var(--gold); box-shadow: 0 0 12px rgba(255,215,0,0.35); color: var(--gold-bright); }
 
-  /* STATS */
   .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .stat-card {
     background: var(--bg-panel); border: 1px solid var(--border-gold);
@@ -84,7 +80,6 @@
   .xp-bar-wrap { width: 100%; height: 6px; background: #100205; border-radius: 99px; overflow: hidden; margin-top: 5px; }
   .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fde047); width: 20%; transition: width 0.35s ease; }
 
-  /* MISSION STRIP */
   .mission-strip {
     background: linear-gradient(90deg, #2a0a13, #190409); border: 1px solid var(--border-gold);
     border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -96,7 +91,6 @@
     font-size: 0.78rem; font-weight: 900; padding: 4px 10px; border-radius: 8px; white-space: nowrap;
   }
 
-  /* TABS */
   .machine-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   @media (min-width: 600px) { .machine-tabs { grid-template-columns: repeat(4, 1fr); } }
   .tab-btn {
@@ -110,7 +104,6 @@
   .tab-title { font-size: 0.9rem; font-weight: 900; color: var(--gold); }
   .tab-sub { font-size: 0.72rem; color: var(--ivory); opacity: 0.92; margin-top: 2px; }
 
-  /* JACKPOTS */
   .jackpot-strip {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
     background: #140307; border: 1px solid var(--border-gold); border-radius: 12px; padding: 7px;
@@ -119,16 +112,13 @@
   .jp-name { font-size: 0.66rem; font-weight: 800; color: var(--muted); text-transform: uppercase; }
   .jp-val { font-size: 0.88rem; font-weight: 900; color: var(--gold-bright); }
 
-  /* CABINE 3D */
   .cabinet {
     background: linear-gradient(180deg, #320b15 0%, #160308 100%);
     border: 3px solid var(--gold); border-radius: 20px; padding: 14px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.75), inset 0 0 30px rgba(255, 215, 0, 0.14);
     position: relative;
   }
-  .marquee-lights {
-    display: flex; justify-content: space-between; padding: 0 8px 8px;
-  }
+  .marquee-lights { display: flex; justify-content: space-between; padding: 0 8px 8px; }
   .bulb {
     width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
     box-shadow: 0 0 8px var(--gold); animation: blinkBulb 1.2s infinite alternate;
@@ -143,41 +133,61 @@
   .machine-banner h2 { font-size: 1.15rem; color: var(--gold); font-weight: 900; letter-spacing: 0.8px; }
   .machine-banner p { font-size: 0.82rem; color: var(--ivory); }
 
-  /* ROLOS */
+  /* JANELA DE ROLOS COM ESTEIRA VERTICAL REAL */
   .reels-grid {
     display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
-    background: #0b0103; padding: 8px; border-radius: 14px;
-    border: 2px solid var(--gold-dim); box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+    background: #090102; padding: 8px; border-radius: 14px;
+    border: 2px solid var(--gold-dim); box-shadow: inset 0 0 24px rgba(0,0,0,0.95);
+    position: relative;
   }
-  .reel-col { display: flex; flex-direction: column; gap: 6px; }
+  .reel-window {
+    overflow: hidden;
+    height: clamp(210px, 52vw, 315px);
+    border-radius: 10px;
+    background: #120306;
+    position: relative;
+  }
+  /* Sombra superior e inferior para dar profundidade cilíndrica ao rolo */
+  .reel-window::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+    background: linear-gradient(180deg, rgba(0,0,0,0.65) 0%, transparent 16%, transparent 84%, rgba(0,0,0,0.65) 100%);
+  }
+  .reel-strip {
+    display: flex; flex-direction: column;
+    will-change: transform;
+  }
   .cell {
-    aspect-ratio: 1 / 1;
-    background: linear-gradient(180deg, #2d0d16 0%, #19050a 100%);
-    border: 1px solid rgba(255, 215, 0, 0.24); border-radius: 11px;
+    height: clamp(70px, 17.33vw, 105px);
+    padding: 3px;
+    flex-shrink: 0;
+  }
+  .cell-inner {
+    width: 100%; height: 100%;
+    background: linear-gradient(180deg, #2e0d16 0%, #19050a 100%);
+    border: 1px solid rgba(255, 215, 0, 0.24); border-radius: 10px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-size: clamp(1.7rem, 6.2vw, 2.4rem); position: relative;
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s, box-shadow 0.2s;
+    font-size: clamp(1.75rem, 6.4vw, 2.5rem); position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
-  .cell.spinning {
-    animation: reelBlur 0.14s infinite linear;
-    filter: blur(2px); opacity: 0.82;
+  .reel-window.is-spinning .cell-inner {
+    filter: blur(1.2px);
   }
-  @keyframes reelBlur { 0% { transform: translateY(-4px) scaleY(0.9); } 50% { transform: translateY(4px) scaleY(0.9); } 100% { transform: translateY(-4px) scaleY(0.9); } }
-  .cell.landed { animation: bounceLand 0.24s ease-out; }
-  @keyframes bounceLand { 0% { transform: translateY(-10px) scale(0.94); } 60% { transform: translateY(3px) scale(1.03); } 100% { transform: translateY(0) scale(1); } }
-  .cell.win {
+  .cell-inner.win {
     border: 2px solid var(--gold);
     background: radial-gradient(circle, #691b2e 0%, #2b0912 100%);
-    box-shadow: 0 0 18px rgba(255, 215, 0, 0.85); transform: scale(1.06); z-index: 2;
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.9);
+    transform: scale(1.04); z-index: 2;
   }
-  .cell.sticky { border: 2px solid #38bdf8; box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.7); }
+  .cell-inner.sticky {
+    border: 2px solid #38bdf8;
+    box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.75);
+  }
   .coin-tag {
     position: absolute; bottom: 3px; background: linear-gradient(180deg, #fff099, #ffd700);
     color: #1a0508; font-size: 0.66rem; font-weight: 900; padding: 1px 5px; border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.6);
   }
 
-  /* STATUS */
   .status-display {
     margin-top: 12px; background: #100205; border: 1px solid var(--border-gold);
     border-radius: 11px; padding: 10px; text-align: center; font-size: 0.96rem; font-weight: 800;
@@ -185,7 +195,6 @@
   }
   .status-display.win-msg { color: var(--gold-bright); font-size: 1.08rem; border-color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.2); }
 
-  /* CONTROLES */
   .controls-bar { margin-top: 12px; display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 8px; align-items: center; }
   .bet-box { background: #140407; border: 1px solid var(--border-gold); border-radius: 12px; padding: 6px; display: flex; align-items: center; justify-content: space-between; }
   .bet-btn { background: #3f101d; color: var(--gold); border: 1px solid var(--gold-dim); border-radius: 8px; width: 34px; height: 38px; font-size: 1.25rem; font-weight: 900; cursor: pointer; }
@@ -203,7 +212,6 @@
   .auto-btn { background: #330d17; color: var(--ivory); border: 1px solid var(--border-gold); border-radius: 12px; padding: 12px 6px; font-size: 0.84rem; font-weight: 800; cursor: pointer; height: 100%; }
   .auto-btn.active { background: #b91c1c; border-color: #fca5a5; }
 
-  /* EXTRAS */
   .extras-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   @media (max-width: 560px) { .extras-grid { grid-template-columns: 1fr; } }
   .panel-box { background: var(--bg-panel); border: 1px solid var(--border-gold); border-radius: 14px; padding: 12px; }
@@ -217,7 +225,6 @@
   .relic-slot div { font-size: 1.45rem; }
   .relic-slot span { display: block; font-size: 0.7rem; color: var(--ivory); font-weight: 700; margin-top: 2px; }
 
-  /* MODALS */
   .modal-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(8, 2, 3, 0.9); display: none; align-items: center; justify-content: center; padding: 16px; }
   .modal-overlay.open { display: flex; }
   .modal-card { background: #240910; border: 2px solid var(--gold); border-radius: 16px; max-width: 460px; width: 100%; padding: 20px; color: var(--ivory); max-height: 88vh; overflow-y: auto; }
@@ -246,7 +253,7 @@
     <div class="brand-title">TELAS DO PASSADO</div>
     <div class="brand-sub">Sloto-Verse • Edição Deluxe</div>
   </div>
-  <p class="splash-desc">4 máquinas de cinema e aventura com efeitos especiais, missões rápidas e zero dinheiro real.</p>
+  <p class="splash-desc">4 máquinas com rolos reais, efeitos especiais, missões rápidas e zero dinheiro real.</p>
   <button class="btn-primary" onclick="startGame()">▶ Entrar no Cinema</button>
 </div>
 
@@ -449,13 +456,13 @@ function playTone(freq, type, duration, vol = 0.08) {
     osc.connect(gain); gain.connect(actx.destination); osc.start(); osc.stop(actx.currentTime + duration);
   } catch (e) {}
 }
-function sfxSpin() { playTone(220, 'triangle', 0.08, 0.06); }
-function sfxStop(col) { playTone(145 + col * 38, 'sine', 0.11, 0.09); }
+function sfxTick() { playTone(310, 'triangle', 0.035, 0.035); }
+function sfxStop(col) { playTone(145 + col * 38, 'sine', 0.12, 0.1); }
 function sfxTension() { playTone(440, 'sawtooth', 0.16, 0.06); }
 function sfxWin() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.24, 0.11), i * 75)); }
 
-function loadState() { try { const s = localStorage.getItem('telas_passado_deluxe_v4'); if (s) state = { ...state, ...JSON.parse(s) }; } catch (e) {} }
-function saveState() { try { localStorage.setItem('telas_passado_deluxe_v4', JSON.stringify(state)); } catch (e) {} }
+function loadState() { try { const s = localStorage.getItem('telas_passado_deluxe_v5'); if (s) state = { ...state, ...JSON.parse(s) }; } catch (e) {} }
+function saveState() { try { localStorage.setItem('telas_passado_deluxe_v5', JSON.stringify(state)); } catch (e) {} }
 function startGame() { document.getElementById('splash-screen').classList.add('hidden'); playTone(523, 'sine', 0.18); }
 function toggleSound() { state.sound = !state.sound; document.getElementById('sound-btn').textContent = state.sound ? '🔊 Som' : '🔇 Mudo'; saveState(); }
 
@@ -507,25 +514,93 @@ function updateUI() {
   document.getElementById('relic-count').textContent = `${state.relics.length}/${RELICS.length}`;
 }
 
-function renderGrid(winCells = new Set(), landedCol = -1) {
+function makeCellHTML(sym, c, r, isWin = false, isSticky = false) {
+  const cls = 'cell-inner' + (isWin ? ' win' : '') + (isSticky ? ' sticky' : '');
+  const tag = (sym.isCoin && sym.coinVal) ? `<span class="coin-tag">${sym.coinVal >= 1000 ? (sym.coinVal/1000)+'K' : sym.coinVal}</span>` : '';
+  return `<div class="cell"><div class="${cls}">${sym.icon}${tag}</div></div>`;
+}
+
+function renderGrid(winCells = new Set()) {
   const cont = document.getElementById('reels-grid'); cont.innerHTML = '';
   for (let c = 0; c < 5; c++) {
-    const colEl = document.createElement('div'); colEl.className = 'reel-col';
+    const winEl = document.createElement('div'); winEl.className = 'reel-window'; winEl.id = `reel-win-${c}`;
+    const strip = document.createElement('div'); strip.className = 'reel-strip'; strip.id = `reel-strip-${c}`;
+    let html = '';
     for (let r = 0; r < 3; r++) {
-      const key = `${c}-${r}`, sym = gridData[c][r], cell = document.createElement('div');
-      cell.className = 'cell'; cell.id = `cell-${c}-${r}`;
-      if (c === landedCol) cell.classList.add('landed');
-      if (winCells.has(key)) cell.classList.add('win');
-      if (state.stickyWilds[key]) cell.classList.add('sticky');
-      cell.textContent = sym.icon;
-      if (sym.isCoin && sym.coinVal) {
-        const tag = document.createElement('span'); tag.className = 'coin-tag';
-        tag.textContent = sym.coinVal >= 1000 ? (sym.coinVal / 1000) + 'K' : sym.coinVal; cell.appendChild(tag);
-      }
-      colEl.appendChild(cell);
+      const key = `${c}-${r}`;
+      html += makeCellHTML(gridData[c][r], c, r, winCells.has(key), !!state.stickyWilds[key]);
     }
-    cont.appendChild(colEl);
+    strip.innerHTML = html;
+    winEl.appendChild(strip);
+    cont.appendChild(winEl);
   }
+}
+
+// ANIMAÇÃO DE ROLO GIRANDO VERTICALMENTE DE VERDADE
+async function animatePhysicalReels(nextGrid, bonusHits) {
+  const STRIP_LEN = 18; // Quantidade de símbolos que passam rolando na esteira
+  const promises = [];
+
+  // Som de roleta girando
+  const tickInterval = setInterval(sfxTick, 85);
+
+  for (let c = 0; c < 5; c++) {
+    const winEl = document.getElementById(`reel-win-${c}`);
+    const strip = document.getElementById(`reel-strip-${c}`);
+    winEl.classList.add('is-spinning');
+
+    // Monta a tira: [3 símbolos finais no topo] + [12 aleatórios no meio] + [3 símbolos atuais embaixo]
+    let stripHTML = '';
+    for (let r = 0; r < 3; r++) {
+      const k = `${c}-${r}`;
+      stripHTML += makeCellHTML(nextGrid[c][r], c, r, false, !!state.stickyWilds[k]);
+    }
+    for (let i = 0; i < STRIP_LEN - 6; i++) {
+      stripHTML += makeCellHTML(pickWeightedSymbol(state.machine), c, i);
+    }
+    for (let r = 0; r < 3; r++) {
+      const k = `${c}-${r}`;
+      stripHTML += makeCellHTML(gridData[c][r], c, r, false, !!state.stickyWilds[k]);
+    }
+
+    strip.style.transition = 'none';
+    strip.innerHTML = stripHTML;
+
+    // Começa posicionado lá embaixo mostrando os 3 símbolos atuais
+    const cellH = winEl.clientHeight / 3;
+    const startY = -(STRIP_LEN - 3) * cellH;
+    strip.style.transform = `translateY(${startY}px)`;
+    strip.offsetHeight; // Força reflow para registrar posição inicial
+
+    const extraSuspense = (bonusHits >= 2 && c >= 3) ? 450 : 0;
+    if (extraSuspense > 0) setTimeout(sfxTension, 650 + c * 220);
+    const duration = 850 + c * 240 + extraSuspense;
+
+    const p = new Promise(resolve => {
+      // Desliza toda a esteira para baixo até translateY(0px) com quique mecânico no final
+      strip.style.transition = `transform ${duration}ms cubic-bezier(0.18, 0.89, 0.28, 1.04)`;
+      strip.style.transform = 'translateY(0px)';
+
+      setTimeout(() => {
+        winEl.classList.remove('is-spinning');
+        sfxStop(c);
+        // Limpa os símbolos extras deixando apenas os 3 finais
+        strip.style.transition = 'none';
+        let finalHTML = '';
+        for (let r = 0; r < 3; r++) {
+          const k = `${c}-${r}`;
+          finalHTML += makeCellHTML(nextGrid[c][r], c, r, false, !!state.stickyWilds[k]);
+        }
+        strip.innerHTML = finalHTML;
+        resolve();
+      }, duration);
+    });
+    promises.push(p);
+  }
+
+  await Promise.all(promises);
+  clearInterval(tickInterval);
+  gridData = nextGrid;
 }
 
 function setStatus(msg, isWin = false) { const el = document.getElementById('status-msg'); el.textContent = msg; el.className = 'status-display' + (isWin ? ' win-msg' : ''); }
@@ -563,22 +638,24 @@ async function handleSpinClick() {
     state.balance -= bet; state.jackpots.mini += bet*0.02; state.jackpots.minor += bet*0.015; state.jackpots.major += bet*0.01; state.jackpots.grand += bet*0.005;
   } else { state.freeSpins--; }
 
-  isSpinning = true; document.getElementById('spin-btn').disabled = true; updateUI(); sfxSpin();
+  isSpinning = true; document.getElementById('spin-btn').disabled = true; updateUI();
   setStatus(isFree ? `🔥 RODADA GRÁTIS (${state.freeSpins} restantes)...` : 'Girando os rolos...');
-  for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) if (!state.stickyWilds[`${c}-${r}`]) document.getElementById(`cell-${c}-${r}`)?.classList.add('spinning');
 
+  // Sorteia o resultado final e anima os rolos deslizando verticalmente
+  const nextGrid = [];
   let bonusHits = 0;
   for (let c = 0; c < 5; c++) {
-    const delay = (bonusHits >= 2 && c >= 3) ? 320 : 125;
-    if (bonusHits >= 2 && c >= 3) sfxTension();
-    await new Promise(res => setTimeout(res, delay));
+    const col = [];
     for (let r = 0; r < 3; r++) {
       const k = `${c}-${r}`;
-      gridData[c][r] = state.stickyWilds[k] ? { id: 'W', icon: '🃏', isWild: true } : pickWeightedSymbol(state.machine);
-      if (gridData[c][r].isScatter || gridData[c][r].isCoin) bonusHits++;
+      const sym = state.stickyWilds[k] ? { id: 'W', icon: '🃏', isWild: true } : pickWeightedSymbol(state.machine);
+      if (c < 3 && (sym.isScatter || sym.isCoin)) bonusHits++;
+      col.push(sym);
     }
-    renderGrid(new Set(), c); sfxStop(c);
+    nextGrid.push(col);
   }
+
+  await animatePhysicalReels(nextGrid, bonusHits);
 
   progressMission('spins');
   await evaluateSpin(bet, isFree);
