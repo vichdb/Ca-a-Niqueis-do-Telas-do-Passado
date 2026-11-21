@@ -147,6 +147,37 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
         }
+
+        /* ===== Visual de cada máquina (só cores e formas, sem animação pesada) ===== */
+        body[data-mach="neon"]  { --ac:#22d3ee; --ac2:#ec4899; --acrgb:34,211,238; }
+        body[data-mach="coins"] { --ac:#facc15; --ac2:#f97316; --acrgb:250,204,21; }
+        body[data-mach="totem"] { --ac:#4ade80; --ac2:#f97316; --acrgb:74,222,128; }
+        body[data-mach="zeus"]  { --ac:#7dd3fc; --ac2:#fde68a; --acrgb:125,211,252; }
+        body[data-mach="neon"]  { background-color:#07040f !important; background-image: radial-gradient(circle at 20% 15%, rgba(236,72,153,.28) 0%, transparent 55%), radial-gradient(circle at 80% 85%, rgba(34,211,238,.22) 0%, transparent 55%), linear-gradient(#07040f,#0b0620) !important; }
+        body[data-mach="coins"] { background-color:#120a02 !important; background-image: radial-gradient(circle at 50% 20%, rgba(250,204,21,.22) 0%, transparent 60%), linear-gradient(#1a0f03,#0a0501) !important; }
+        body[data-mach="totem"] { background-color:#04120a !important; background-image: radial-gradient(circle at 50% 15%, rgba(34,197,94,.22) 0%, transparent 55%), radial-gradient(circle at 50% 100%, rgba(194,65,12,.25) 0%, transparent 55%), linear-gradient(#06170d,#030a06) !important; }
+        body[data-mach="zeus"]  { background-color:#050b1c !important; background-image: radial-gradient(circle at 50% 10%, rgba(125,211,252,.28) 0%, transparent 60%), linear-gradient(#0a1633,#040918) !important; }
+        body[data-mach] .deco-frame { border-color: var(--ac); box-shadow: inset 0 0 15px rgba(0,0,0,.8), 0 0 22px rgba(var(--acrgb), .35); }
+        body[data-mach] .deco-frame::before { border-color: rgba(var(--acrgb), .45); }
+        body[data-mach] .reel-container { border-color: rgba(var(--acrgb), .6) !important; }
+        body[data-mach] .machine-tab.active { border-color: var(--ac) !important; color: #fff !important; background: rgba(var(--acrgb), .18) !important; box-shadow: 0 4px 12px rgba(var(--acrgb), .3) !important; }
+        body[data-mach] #machTitle { color: var(--ac); }
+        body[data-mach] .symbol-name { color: rgba(255,255,255,.75) !important; }
+        body[data-mach] .symbol-tile.winning { border-color: var(--ac); box-shadow: 0 0 14px rgba(var(--acrgb), .85); }
+        #machVol { display:inline-block; margin-top:2px; font-size:10px; font-weight:700; padding:1px 6px; border-radius:999px; background: rgba(var(--acrgb), .18); color: var(--ac); border: 1px solid rgba(var(--acrgb), .5); }
+        /* NEON VEGAS: letreiro, cantos retos suaves, linhas de varredura */
+        body[data-mach="neon"] .reel-container { background: repeating-linear-gradient(0deg, rgba(34,211,238,.05) 0 2px, transparent 2px 5px), linear-gradient(180deg,#060214,#12072a 50%,#060214) !important; }
+        body[data-mach="neon"] .symbol-tile { background: linear-gradient(160deg, rgba(40,10,70,.9), rgba(8,4,26,.95)); border: 1.5px solid rgba(34,211,238,.55); border-radius: 10px !important; box-shadow: inset 0 0 10px rgba(236,72,153,.25); }
+        /* GOLD COIN GRAB: fichas redondas douradas */
+        body[data-mach="coins"] .reel-container { background: radial-gradient(circle at 50% 50%, #3a2504 0%, #120a02 85%) !important; }
+        body[data-mach="coins"] .symbol-tile { background: radial-gradient(circle at 35% 30%, rgba(250,204,21,.28), rgba(60,35,4,.95) 70%); border: 2px solid #eab308; border-radius: 36px !important; box-shadow: inset 0 -6px 10px rgba(0,0,0,.45), inset 0 3px 6px rgba(253,224,71,.3); }
+        /* TOTEM AVALANCHE: pedra, cantos quase retos, borda grossa */
+        body[data-mach="totem"] .reel-container { background: linear-gradient(180deg,#0a1a10,#1a1208 50%,#0a1a10) !important; }
+        body[data-mach="totem"] .symbol-tile { background: linear-gradient(145deg,#3b3a2c,#1d1c14); border: 3px solid #78716c; border-radius: 3px !important; box-shadow: inset 0 0 0 2px rgba(0,0,0,.5), inset 0 -8px 12px rgba(0,0,0,.4); }
+        body[data-mach="totem"] .symbol-tile::after { content:''; position:absolute; left:4px; right:4px; top:4px; height:3px; background: linear-gradient(90deg,#16a34a,#f97316,#16a34a); opacity:.7; border-radius:2px; }
+        /* ZEUS: mármore, arco de templo */
+        body[data-mach="zeus"] .reel-container { background: linear-gradient(180deg,#0b1838,#142a5c 50%,#0b1838) !important; }
+        body[data-mach="zeus"] .symbol-tile { background: linear-gradient(180deg,rgba(226,240,255,.2),rgba(30,58,138,.55)); border: 1.5px solid rgba(253,230,138,.8); border-radius: 30px 30px 6px 6px !important; box-shadow: inset 0 0 14px rgba(125,211,252,.35); }
         .machine-tab[data-lock] { opacity: .55; filter: grayscale(.6); }
         .machine-tab[data-lock]::after { content: '🔒 Nv ' attr(data-lock); font-size: 10px; margin-left: 4px; }
         #pauseNote { position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 60; background: #1c1917; color: #fde68a; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; font-size: 13px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.6); max-width: 520px; margin: 0 auto; }
@@ -158,7 +189,7 @@
 .reel-column.rolling { cursor: pointer; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between text-slate-100">
+<body data-mach="neon" class="min-h-screen flex flex-col justify-between text-slate-100">
 
     <!-- CANVAS PARTICLES OVERLAY -->
     <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
@@ -386,7 +417,7 @@
                     <span id="machIcon" class="text-2xl">🎬</span>
                     <div>
                         <h2 id="machTitle" class="font-cinzel font-bold text-amber-300 text-sm md:text-base leading-none">NEON VEGAS</h2>
-                        <span id="machSubtitle" class="text-[10px] text-slate-400">5 Linhas Clássicas & Free Spins 2x</span>
+                        <span id="machSubtitle" class="text-[10px] text-slate-400">5 Linhas Clássicas & Free Spins 2x</span><br><span id="machVol">⚡ Volatilidade média-alta</span>
                     </div>
                 </div>
 
@@ -867,6 +898,31 @@ const SlotMath = (function () {
 
         const sfx = new SoundEngine();
 
+
+        /* Som próprio de cada máquina: timbre, notas e escala diferentes */
+        (function themedSounds() {
+            const T = {
+                neon:  { spin: ['square', 200, 70, .06, .07], stop: ['square', 330, 330, .1, .08], win: ['square', [523.25, 659.25, 783.99, 1046.5], .07, .16, .10], big: ['sawtooth', [392, 523.25, 659.25, 783.99, 1046.5, 1318.5], .09, .3, .12], coin: ['square', 1175, 1568, .1, .1] },
+                coins: { spin: ['triangle', 700, 350, .07, .05], stop: ['sine', 520, 520, .12, .18], win: ['sine', [659.25, 830.6, 987.77, 1318.5], .08, .35, .2], big: ['sine', [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568], .1, .5, .25], coin: ['sine', 1568, 2093, .18, .09] },
+                totem: { spin: ['triangle', 110, 50, .14, .09], stop: ['triangle', 95, 60, .26, .14], win: ['triangle', [220, 261.63, 329.63, 392], .1, .3, .24], big: ['sawtooth', [196, 246.94, 293.66, 392, 493.88], .12, .4, .1], coin: ['triangle', 330, 440, .2, .1] },
+                zeus:  { spin: ['sine', 320, 180, .08, .07], stop: ['sine', 659.25, 440, .16, .2], win: ['sine', [392, 493.88, 587.33, 739.99], .09, .4, .18], big: ['sawtooth', [293.66, 392, 493.88, 587.33, 783.99, 987.77], .13, .5, .1], coin: ['sine', 1760, 1760, .15, .12] }
+            };
+            function tone(c, type, f0, f1, t0, dur, vol) {
+                const o = c.createOscillator(), g = c.createGain();
+                o.type = type; o.frequency.setValueAtTime(f0, t0);
+                if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+                g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.01, t0 + dur);
+                o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+            }
+            const cur = () => T[sfx.th] || T.neon;
+            sfx.th = 'neon';
+            sfx.playSpin = function () { if (!this.enabled || !this.ctx) return; const s = cur().spin; tone(this.ctx, s[0], s[1], s[2], this.ctx.currentTime, s[4], s[3] * 2.2); };
+            sfx.playStop = function () { if (!this.enabled || !this.ctx) return; const s = cur().stop; tone(this.ctx, s[0], s[1], s[2], this.ctx.currentTime, s[4], s[3] * 1.6); };
+            sfx.playCoin = function () { if (!this.enabled || !this.ctx) return; const s = cur().coin; tone(this.ctx, s[0], s[1], s[2], this.ctx.currentTime, 0.15, s[3] * 2); };
+            sfx.playWin = function () { if (!this.enabled || !this.ctx) return; const s = cur().win; s[1].forEach((f, i) => tone(this.ctx, s[0], f, f, this.ctx.currentTime + i * s[2], s[3], s[4])); };
+            sfx.playBigWin = function () { if (!this.enabled || !this.ctx) return; const s = cur().big; s[1].forEach((f, i) => tone(this.ctx, s[0], f, f, this.ctx.currentTime + i * s[2], s[3], s[4])); };
+        })();
+
         // iPhone/Android só liberam o som depois de um toque: destrava no primeiro toque/clique/tecla
         (function unlockAudio() {
             const unlock = () => {
@@ -882,6 +938,22 @@ const SlotMath = (function () {
                 else if (sfx.enabled) { sfx.ctx.resume && sfx.ctx.resume(); }
             });
         })();
+
+
+        /* --- IDENTIDADE DE CADA MÁQUINA (tema, som, música, volatilidade) --- */
+        const MTHEME = {
+            neon:  { vol: '⚡ Volatilidade média-alta · Free Spins com Wilds fixos', spinTxt: '🎬 LUZES DE NEON ACESAS... GIRANDO!', fx: ['#22d3ee', '#ec4899', '#fde047'], music: 'neon' },
+            coins: { vol: '🔥 Volatilidade alta · Hold & Spin com 4 Jackpots', spinTxt: '🪙 AS MOEDAS ESTÃO CAINDO... GIRANDO!', fx: ['#facc15', '#f59e0b', '#fff7ae'], music: 'ouro' },
+            totem: { vol: '🎯 Volatilidade média · cascatas até 10x', spinTxt: '🗿 OS TOTENS DESPERTAM... GIRANDO!', fx: ['#4ade80', '#f97316', '#d6d3d1'], music: 'tribal' },
+            zeus:  { vol: '🍀 Volatilidade baixa · ganhos frequentes, 243 modos', spinTxt: '⚡ O TROVÃO DE ZEUS ECOA... GIRANDO!', fx: ['#7dd3fc', '#fde68a', '#ffffff'], music: 'olimpo' }
+        };
+        function applyMachineTheme(k) {
+            const t = MTHEME[k] || MTHEME.neon;
+            document.body.dataset.mach = k;
+            const v = document.getElementById('machVol'); if (v) v.textContent = t.vol;
+            if (sfx) sfx.th = k;
+            try { if (window.TP && TP.music && TP.music.set) TP.music.set(t.music); } catch (e) {}
+        }
 
         /* --- CANVAS FX PARTICLES --- */
         const fxCanvas = document.getElementById('fxCanvas');
@@ -908,7 +980,7 @@ const SlotMath = (function () {
                     vx: (Math.random() - 0.5) * 12,
                     vy: (Math.random() - 0.7) * 12,
                     size: Math.random() * 8 + 4,
-                    color: type === 'gold' ? '#fbbf24' : '#ef4444',
+                    color: type === 'gold' ? (MTHEME[state.currentMachine] || MTHEME.neon).fx[Math.floor(Math.random() * 3)] : '#ef4444',
                     alpha: 1,
                     life: Math.random() * 40 + 30
                 });
@@ -1182,6 +1254,7 @@ const SlotMath = (function () {
             const need = MACHINE_UNLOCK[machKey] || 1;
             if (state.level < need) { setAnnouncer(`🔒 ${MACHINES[machKey].name.toUpperCase()} LIBERA NO NÍVEL ${need}. Continue jogando para subir de nível!`); return; }
             state.currentMachine = machKey;
+            applyMachineTheme(machKey);
             if (window.TPS) TPS.machine(machKey);
             
             document.querySelectorAll('.machine-tab').forEach(tab => {
@@ -1263,7 +1336,7 @@ const SlotMath = (function () {
 
             document.getElementById('winDisplay').textContent = '0';
             clearPaylines();
-            setAnnouncer('🎬 GIRANDO AS TELAS DO PASSADO...');
+            setAnnouncer((MTHEME[state.currentMachine] || MTHEME.neon).spinTxt);
 
             // Quest tracker for spins
             updateQuestProgress(1, 1);
@@ -2108,6 +2181,9 @@ const SlotMath = (function () {
     jornal:  { bpm: 96, root: 48, wave: 'triangle', bassWave: 'sine', prog: [[0, 4, 7, 11], [9, 12, 16, 19], [2, 5, 9, 12], [7, 11, 14, 17]], arp: [0, 1, 2, 3, 2, 1, 2, 3], drums: 0, oct: 1 },
     estadio: { bpm: 112, root: 45, wave: 'square', bassWave: 'triangle', prog: [[0, 4, 7], [5, 9, 12], [7, 11, 14], [0, 4, 7]], arp: [0, 0, 1, 0, 2, 0, 1, 2], drums: 1, oct: 1 },
     cinema:  { bpm: 72, root: 46, wave: 'triangle', bassWave: 'sine', prog: [[0, 3, 7], [8, 12, 15], [5, 8, 12], [7, 11, 14]], arp: [0, 1, 2, 1, 0, 2, 1, 2], drums: 0, oct: 1, waltz: true },
+    ouro:    { bpm: 104, root: 48, wave: 'triangle', bassWave: 'sine', prog: [[0, 4, 7], [5, 9, 12], [7, 11, 14], [0, 4, 7, 11]], arp: [0, 2, 1, 2, 0, 1, 2, 1], drums: 1, oct: 1 },
+    tribal:  { bpm: 92, root: 38, wave: 'triangle', bassWave: 'triangle', prog: [[0, 3, 7], [-2, 2, 5], [0, 3, 7], [3, 7, 10]], arp: [0, 0, 2, 0, 1, 0, 2, 1], drums: 1, oct: 1 },
+    olimpo:  { bpm: 80, root: 50, wave: 'sine', bassWave: 'sine', prog: [[0, 4, 7], [2, 6, 9], [0, 4, 7], [7, 11, 14]], arp: [0, 1, 2, 1, 2, 1, 0, 2], drums: 0, oct: 1 },
     terror:  { bpm: 66, root: 40, wave: 'sine', bassWave: 'triangle', prog: [[0, 3, 6], [1, 4, 8], [0, 3, 6], [-2, 1, 5]], arp: [0, 2, 1, 2, 0, 1, 2, 1], drums: 0, oct: 1 }
   };
   var mus = { style: null, timer: null, step: 0, next: 0, on: false, intensity: 0.5 };
