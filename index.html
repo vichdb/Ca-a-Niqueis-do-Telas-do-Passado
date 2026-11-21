@@ -151,6 +151,11 @@
         #pauseNote { position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 60; background: #1c1917; color: #fde68a; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; font-size: 13px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.6); max-width: 520px; margin: 0 auto; }
         #pauseNote button { margin-top: 8px; padding: 8px 16px; border-radius: 8px; background: #f59e0b; color: #451a03; font-weight: 800; }
     </style>
+<style>
+.reel-column.stopped-pop { animation: stopPop .26s ease-out; }
+@keyframes stopPop { 0% { transform: translateY(-7px); } 60% { transform: translateY(3px); } 100% { transform: translateY(0); } }
+.reel-column.rolling { cursor: pointer; }
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-slate-100">
 
@@ -1330,10 +1335,17 @@ const SlotMath = (function () {
             // Som de giro enquanto houver rolo girando
             const soundInterval = setInterval(() => { sfx.playSpin(); }, 80);
 
+            let stoppedCount = 0;
+            const stopFns = [], stopTimers = [], stoppedFlag = [];
             cols.forEach((col, cIdx) => {
                 const stopOne = () => {
+                    if (stoppedFlag[cIdx]) return;
+                    stoppedFlag[cIdx] = true;
+                    clearTimeout(stopTimers[cIdx]);
                     sfx.playStop();
                     col.classList.remove('suspense');
+                    col.classList.add('stopped-pop');
+                    setTimeout(() => col.classList.remove('stopped-pop'), 260);
                     // Renderiza os símbolos reais do resultado
                     const tiles = col.querySelectorAll(':scope > .symbol-tile');
                     tiles.forEach((tile, rIdx) => {
@@ -1343,19 +1355,36 @@ const SlotMath = (function () {
                     });
                     col.classList.remove('rolling');
                     overlays[cIdx].remove();
-                    if (cIdx === 4) {
+                    stoppedCount++;
+                    if (stoppedCount === cols.length) {
                         clearInterval(soundInterval);
+                        window.__quickStop = null;
                         state.gridState = newGrid;
                         evaluateSpinOutcome();
                     }
                 };
+                stopFns[cIdx] = stopOne;
                 if (cIdx === 4 && wantSuspense) {
                     // suspense: brilho no último rolo nos instantes finais
-                    setTimeout(() => col.classList.add('suspense'), Math.max(0, stopAt[4] - (state.turbo ? 900 : 1900)));
-                    setTimeout(() => setAnnouncer('⭐ SUSPENSE... O ÚLTIMO ROLO ESTÁ PARANDO!', true), Math.max(0, stopAt[3]));
+                    setTimeout(() => { if (!stoppedFlag[4]) col.classList.add('suspense'); }, Math.max(0, stopAt[4] - (state.turbo ? 900 : 1900)));
+                    setTimeout(() => { if (!stoppedFlag[4]) setAnnouncer('⭐ SUSPENSE... O ÚLTIMO ROLO ESTÁ PARANDO!', true); }, Math.max(0, stopAt[3]));
                 }
-                setTimeout(stopOne, stopAt[cIdx]);
+                stopTimers[cIdx] = setTimeout(stopOne, stopAt[cIdx]);
             });
+
+            // PARADA RÁPIDA: toque num rolo (ou aperte Espaço) para pará-lo na hora.
+            // O resultado já foi sorteado antes do giro: parar mais cedo só muda o visual, nunca o prêmio.
+            window.__quickStop = (which) => {
+                if (typeof which === 'number') { if (!stoppedFlag[which]) { stopFns[which](); return true; } return false; }
+                for (let i = 0; i < stopFns.length; i++) if (!stoppedFlag[i]) { stopFns[i](); return true; }
+                return false;
+            };
+            cols.forEach((col, cIdx) => {
+                col.style.cursor = 'pointer';
+                const h = () => { if (window.__quickStop) window.__quickStop(cIdx); };
+                col.onpointerdown = h;
+            });
+            setAnnouncer('👆 TOQUE NUM ROLO (OU ESPAÇO) PARA PARÁ-LO NA HORA');
         }
 
         /* --- PLACAR DAS JOGADAS --- */
@@ -1886,7 +1915,7 @@ const SlotMath = (function () {
             document.getElementById('btnSpin').onclick = () => spin();
             // Espaço/Enter já acionam o botão focado; barra de espaço gira quando nada está focado
             document.addEventListener('keydown', (e) => {
-                if (e.code === 'Space' && document.activeElement === document.body && document.getElementById('splashModal').classList.contains('hidden')) { e.preventDefault(); spin(); }
+                if (e.code === 'Space' && document.activeElement === document.body && document.getElementById('splashModal').classList.contains('hidden')) { e.preventDefault(); if (state.isSpinning) { if (window.__quickStop) window.__quickStop(); } else spin(); }
             });
             
             document.getElementById('btnBetMinus').onclick = () => {
