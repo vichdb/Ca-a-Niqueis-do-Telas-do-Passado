@@ -79,6 +79,16 @@
         .reel-column.suspense { animation: reelSuspense 0.45s ease-in-out infinite alternate; border-radius: 12px; }
         @keyframes reelSuspense { from { box-shadow: 0 0 6px 1px rgba(251,191,36,.35); } to { box-shadow: 0 0 22px 6px rgba(251,191,36,.9); } }
         .score-panel td, .score-panel th { padding: 2px 6px; }
+        .coin-val { font: 700 11px/1 ui-monospace, monospace; color: #fde047; margin-top: 2px; }
+        .coin-val.coin-jp { color: #fff; background: #b91c1c; border-radius: 4px; padding: 1px 4px; font-size: 9px; }
+        .symbol-tile.hs-empty { opacity: .35; filter: grayscale(.8); }
+        .symbol-tile.exploding { animation: tileExplode .45s ease-in forwards; z-index: 12; }
+        @keyframes tileExplode { 0% { transform: scale(1); filter: brightness(1.6); } 60% { transform: scale(1.25); filter: brightness(2.2); opacity: 1; } 100% { transform: scale(.2); opacity: 0; } }
+        .age-bar { background: #450a0a; border-top: 1px solid rgba(239,68,68,.4); color: #fecaca; font-size: 11px; line-height: 1.3; text-align: center; padding: 3px 8px; }
+        .age-bar strong { color: #fff; background: #b91c1c; border-radius: 4px; padding: 0 5px; margin-right: 4px; }
+        .rtp-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 4px; }
+        .rtp-table th, .rtp-table td { border-bottom: 1px solid rgba(120,53,15,.5); padding: 2px 4px; text-align: center; }
+        .rtp-table td:first-child, .rtp-table th:first-child { text-align: left; }
 
         /* Symbol Tile Style */
         .symbol-tile {
@@ -136,6 +146,10 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
         }
+        .machine-tab[data-lock] { opacity: .55; filter: grayscale(.6); }
+        .machine-tab[data-lock]::after { content: '🔒 Nv ' attr(data-lock); font-size: 10px; margin-left: 4px; }
+        #pauseNote { position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 60; background: #1c1917; color: #fde68a; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; font-size: 13px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.6); max-width: 520px; margin: 0 auto; }
+        #pauseNote button { margin-top: 8px; padding: 8px 16px; border-radius: 8px; background: #f59e0b; color: #451a03; font-weight: 800; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between text-slate-100">
@@ -232,9 +246,10 @@
             </div>
 
             <button id="btnEnterGame" class="w-full py-4 rounded-xl font-cinzel font-extrabold text-lg text-amber-950 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 hover:from-yellow-200 hover:to-amber-400 shadow-lg shadow-amber-500/30 transform active:scale-95 transition-all">
-                🎬 ENTRAR NO CINEMA / JOGAR
+                🎬 TENHO +18 • ENTRAR E JOGAR
             </button>
-            <p class="text-[10px] text-slate-400 mt-3">Jogo 100% recreativo sem apostas em dinheiro real. Fichas virtuais sem valor financeiro.</p>
+            <p class="text-xs text-red-200 mt-3 font-bold">🔞 Apenas para maiores de 18 anos. Só fichas virtuais, sem dinheiro real e sem prêmios.</p>
+            <p class="text-[10px] text-slate-400 mt-1">Jogo 100% recreativo. Fichas virtuais sem valor financeiro; nada aqui pode ser comprado, vendido ou sacado.</p>
         </div>
     </div>
 
@@ -293,7 +308,7 @@
             </div>
 
             <!-- Chips Balance & Top Controls -->
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-1.5 max-w-full">
                 <!-- Balance Box -->
                 <div class="flex items-center gap-2 bg-gradient-to-r from-amber-950 to-cinema-900 border border-amber-500/40 rounded-xl px-3 py-1.5 shadow-inner">
                     <span class="text-xl">🪙</span>
@@ -306,7 +321,7 @@
                 </div>
 
                 <!-- Free Chips Refill Button -->
-                <button type="button" aria-label="Recarregar 50 mil fichas grátis" id="btnRefill" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 border border-amber-500/50 p-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all" title="Recarregar Fichas Grátis">
+                <button type="button" aria-label="Recarregar 20 mil fichas virtuais (só quando restarem menos de 2 mil)" id="btnRefill" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 border border-amber-500/50 p-2 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all" title="Recarregar Fichas Grátis">
                     ➕ <span class="hidden md:inline">+50k</span>
                 </button>
 
@@ -333,6 +348,7 @@
             </div>
 
         </div>
+        <div class="age-bar" role="note"><strong>+18</strong>Só fichas virtuais, sem dinheiro real. As fichas não podem ser compradas, vendidas nem trocadas por prêmios.</div>
     </header>
 
     <!-- MAIN GAME AREA -->
@@ -481,7 +497,7 @@
 
     <!-- FOOTER -->
     <footer class="w-full bg-cinema-950/90 border-t border-amber-900/40 py-2 px-4 text-center text-xs text-slate-500">
-        TELAS DO PASSADO: SLOTO-VERSE DELUXE • Jogo 100% Recreativo Sem Apostas em Dinheiro Real • Efeitos Sonoros Via Web Audio API
+        TELAS DO PASSADO: SLOTO-VERSE DELUXE • +18 • Só fichas virtuais, sem dinheiro real • Jogo recreativo
     </footer>
 
     <!-- MODAL 1: WHEEL OF OLYMPUS MINIGAME (Machine 4 Bonus) -->
@@ -536,26 +552,213 @@
                 <h3 class="font-cinzel font-bold text-xl text-amber-300 flex items-center gap-2">ℹ️ REGRAS & PAGAMENTOS</h3>
                 <button type="button" aria-label="Fechar" class="closeModal text-slate-400 hover:text-white text-xl font-bold">&times;</button>
             </div>
-            <div class="text-xs text-slate-300 flex flex-col gap-4">
-                <div>
-                    <h4 class="font-cinzel font-bold text-amber-400 text-sm mb-1">🎬 1. Neon Vegas (5 Linhas)</h4>
-                    <p>Paga da esquerda para a direita em 5 linhas fixas. 3+ Scatters ativam 8 Free Spins com Wild Fixos (Sticky Wilds) e multiplicador 2x.</p>
-                </div>
-                <div>
-                    <h4 class="font-cinzel font-bold text-amber-400 text-sm mb-1">💰 2. Gold Coin Grab (Hold & Spin)</h4>
-                    <p>Cada Moeda de Ouro que aparece paga o valor escrito nela. Com 6 ou mais moedas você ainda leva o bônus do Jackpot Mini!</p>
-                </div>
-                <div>
-                    <h4 class="font-cinzel font-bold text-amber-400 text-sm mb-1">🗿 3. Totem Avalanche</h4>
-                    <p>A cada giro seguido com prêmio o multiplicador sobe: 1x ➔ 2x ➔ 3x ... até 10x. Um giro sem prêmio volta para 1x.</p>
-                </div>
-                <div>
-                    <h4 class="font-cinzel font-bold text-amber-400 text-sm mb-1">⚡ 4. Zeus 243 Ways</h4>
-                    <p>Pagamentos por adjacência em 243 combinações possíveis (esquerda para a direita). 3 símbolos do Raio de Zeus ativam o minigame Roda do Olimpo.</p>
-                </div>
-            </div>
+            <div id="paytableBody" class="text-xs text-slate-300 flex flex-col gap-4"></div>
         </div>
     </div>
+
+    <!-- MOTOR MATEMÁTICO (probabilidades e prêmios; o simulador usa este mesmo bloco) -->
+    <script id="slotMath">
+/* === MOTOR MATEMÁTICO DO SLOTO-VERSE ===
+   Todas as probabilidades e prêmios ficam AQUI (jogo e simulador usam o mesmo código).
+   Prêmios em múltiplos da aposta. Só fichas virtuais. */
+const SlotMath = (function () {
+    const COLS = 5, ROWS = 3;
+    const LINES = [
+        [[0,1],[1,1],[2,1],[3,1],[4,1]],
+        [[0,0],[1,0],[2,0],[3,0],[4,0]],
+        [[0,2],[1,2],[2,2],[3,2],[4,2]],
+        [[0,0],[1,1],[2,2],[3,1],[4,0]],
+        [[0,2],[1,1],[2,0],[3,1],[4,2]]
+    ];
+    // w = peso (chance relativa em cada casa); pay = [3, 4, 5 iguais] em 'unidades' (1 unidade = aposta/20; 20 unidades = 1x a aposta total)
+    const CFG = {
+        neon: { type: 'lines', sym: {
+            s7:   { w: 3,  pay: [20, 100, 1500] },
+            dia:  { w: 5,  pay: [13, 65, 800] },
+            bel:  { w: 8,  pay: [8, 32, 400] },
+            che:  { w: 11, pay: [5, 20, 200] },
+            bar:  { w: 14, pay: [4, 13, 100] },
+            wild: { w: 2.5, wild: true, pay: [13, 80, 650] },
+            scat: { w: 1.0, scatter: true }
+        }, fsCount: 8, fsMult: 2, fsTrigger: 3 },
+        coins: { type: 'lines', sym: {
+            bar_gold: { w: 5,  pay: [11, 54, 780] },
+            bag:      { w: 8,  pay: [7, 34, 400] },
+            gem:      { w: 12, pay: [5, 22, 155] },
+            ring:     { w: 16, pay: [2, 13, 80] },
+            wild:     { w: 5,  wild: true, pay: [11, 78, 1080] },
+            coin:     { w: 6.3, coin: true }
+        }, hsTrigger: 6, hsRespins: 3, hsChance: 0.065, grand: 1000 },
+        totem: { type: 'cascade', sym: {
+            t_gold:   { w: 4,  pay: [36, 115, 840] },
+            t_red:    { w: 7,  pay: [23, 59, 315] },
+            t_green:  { w: 10, pay: [12, 36, 126] },
+            t_blue:   { w: 14, pay: [6, 19, 63] },
+            t_purple: { w: 18, pay: [6, 14, 42] },
+            wild:     { w: 4,  wild: true, pay: [36, 136, 840] }
+        }, ladder: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+        zeus: { type: 'ways', unit: 20, sym: {
+            zeus:        { w: 8,  pay: [5, 15, 48] },
+            peg:         { w: 14, pay: [3, 8, 24] },
+            temple:      { w: 20, pay: [2, 4, 12] },
+            harp:        { w: 26, pay: [1, 3, 8] },
+            helm:        { w: 34, pay: [1, 2, 5] },
+            wheel_bonus: { w: 3,  bonus: true },
+            wild:        { w: 4,  wild: true }
+        } }
+    };
+    // Valores das moedas do Hold & Spin (em x aposta). jp = jackpot.
+    const COIN_TABLE = [
+        { m: 1, w: 380 }, { m: 2, w: 270 }, { m: 3, w: 150 }, { m: 5, w: 90 },
+        { m: 8, w: 45 }, { m: 12, w: 25 }, { m: 20, w: 15 },
+        { m: 20, w: 12, jp: 'MINI' }, { m: 50, w: 4, jp: 'MINOR' }, { m: 250, w: 1, jp: 'MAJOR' }
+    ];
+    const JACKPOTS = { MINI: 20, MINOR: 50, MAJOR: 250, GRAND: 1000 };
+    // Roda do Olimpo: 16 fatias iguais, prêmio em x aposta
+    const WHEEL = [2, 2, 2, 3, 3, 5, 5, 5, 8, 8, 10, 15, 20, 40, 100, 250];
+
+    const cache = {};
+    function picker(mk) {
+        if (cache[mk]) return cache[mk];
+        const ids = Object.keys(CFG[mk].sym); let tot = 0; const cum = [];
+        ids.forEach(id => { tot += CFG[mk].sym[id].w; cum.push(tot); });
+        return (cache[mk] = { ids, cum, tot });
+    }
+    function pickId(mk, rng) {
+        const p = picker(mk); const x = rng() * p.tot;
+        for (let i = 0; i < p.cum.length; i++) if (x < p.cum[i]) return p.ids[i];
+        return p.ids[p.ids.length - 1];
+    }
+    function makeGrid(mk, rng, sticky) {
+        const g = [];
+        for (let c = 0; c < COLS; c++) {
+            const col = [];
+            for (let r = 0; r < ROWS; r++) col.push(pickId(mk, rng));
+            g.push(col);
+        }
+        (sticky || []).forEach(s => { g[s.c][s.r] = 'wild'; });
+        return g;
+    }
+    function count(mk, grid, flag) {
+        let n = 0;
+        grid.forEach(col => col.forEach(id => { if (CFG[mk].sym[id][flag]) n++; }));
+        return n;
+    }
+    function evalLines(mk, grid, bet) {
+        const S = CFG[mk].sym, lineBet = bet / 20; const wins = []; let total = 0;
+        LINES.forEach((line, li) => {
+            const ids = line.map(p => grid[p[0]][p[1]]);
+            let i = 0; while (i < 5 && S[ids[i]].wild) i++;
+            let pay = 0, cnt = 0, sym = null;
+            if (i >= 3 && S.wild.pay) { pay = S.wild.pay[i - 3]; cnt = i; sym = 'wild'; }
+            if (i < 5 && S[ids[i]].pay) {
+                const t = ids[i]; let n = i + 1;
+                while (n < 5 && (ids[n] === t || S[ids[n]].wild)) n++;
+                if (n >= 3 && S[t].pay[n - 3] > pay) { pay = S[t].pay[n - 3]; cnt = n; sym = t; }
+            }
+            if (pay > 0) { total += pay * lineBet; wins.push({ line: li, cells: line.slice(0, cnt), sym, count: cnt, pay: pay * lineBet }); }
+        });
+        return { total, wins };
+    }
+    function evalWays(mk, grid, bet) {
+        const cfg = CFG[mk], S = cfg.sym, unit = bet / cfg.unit; const wins = []; let total = 0;
+        Object.keys(S).forEach(id => {
+            if (!S[id].pay || S[id].wild) return;
+            let n = 0, ways = 1; const cells = [];
+            for (let c = 0; c < COLS; c++) {
+                const rows = []; for (let r = 0; r < ROWS; r++) if (grid[c][r] === id || S[grid[c][r]].wild) rows.push(r);
+                if (!rows.length) break;
+                ways *= rows.length; n++; rows.forEach(r => cells.push([c, r]));
+            }
+            if (n >= 3) { const pay = S[id].pay[n - 3] * ways * unit; total += pay; wins.push({ sym: id, count: n, ways, cells, pay }); }
+        });
+        return { total, wins };
+    }
+    // Totem: remove as casas premiadas, símbolos caem, novos entram por cima
+    function cascade(mk, grid, cells, rng) {
+        const rm = {}; cells.forEach(p => { rm[p[0] + ',' + p[1]] = 1; });
+        const ng = [];
+        for (let c = 0; c < COLS; c++) {
+            const kept = []; for (let r = ROWS - 1; r >= 0; r--) if (!rm[c + ',' + r]) kept.push(grid[c][r]);
+            const col = []; for (let k = 0; k < ROWS - kept.length; k++) col.push(pickId(mk, rng));
+            for (let k = kept.length - 1; k >= 0; k--) col.push(kept[k]);
+            ng.push(col);
+        }
+        return ng;
+    }
+    function uniqCells(wins) {
+        const seen = {}, out = [];
+        wins.forEach(w => w.cells.forEach(p => { const k = p[0] + ',' + p[1]; if (!seen[k]) { seen[k] = 1; out.push(p); } }));
+        return out;
+    }
+    // Hold & Spin
+    function rollCoin(rng) {
+        let tot = 0; COIN_TABLE.forEach(e => tot += e.w);
+        let x = rng() * tot;
+        for (const e of COIN_TABLE) { if (x < e.w) return { m: e.m, jp: e.jp || null }; x -= e.w; }
+        return { m: 1, jp: null };
+    }
+    function coinMap(grid, rng) {
+        const held = [];
+        for (let c = 0; c < COLS; c++) { held.push([]); for (let r = 0; r < ROWS; r++) held[c].push(grid[c][r] === 'coin' ? rollCoin(rng) : null); }
+        return held;
+    }
+    function hsRespin(held, rng) {
+        const added = [];
+        for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++)
+            if (!held[c][r] && rng() < CFG.coins.hsChance) { const coin = rollCoin(rng); held[c][r] = coin; added.push({ c, r, coin }); }
+        return added;
+    }
+    function hsCount(held) { let n = 0; held.forEach(col => col.forEach(x => { if (x) n++; })); return n; }
+    function hsTotal(held, bet) {
+        let m = 0; held.forEach(col => col.forEach(x => { if (x) m += x.m; }));
+        const full = hsCount(held) === COLS * ROWS;
+        return { total: (m + (full ? JACKPOTS.GRAND : 0)) * bet, full };
+    }
+    function hsPlay(held, rng) { // simulação completa (o jogo faz o mesmo passo a passo)
+        let respins = CFG.coins.hsRespins;
+        while (respins > 0 && hsCount(held) < COLS * ROWS) {
+            if (hsRespin(held, rng).length) respins = CFG.coins.hsRespins; else respins--;
+        }
+    }
+    // Rodada completa (para simulação)
+    function playRound(mk, bet, rng) {
+        const cfg = CFG[mk]; const out = { pay: 0, bonus: 0, big: 0, bp: 0 };
+        if (mk === 'neon') {
+            const g = makeGrid(mk, rng); out.pay += Math.round(evalLines(mk, g, bet).total);
+            if (count(mk, g, 'scatter') >= cfg.fsTrigger) {
+                out.bonus = 1; const sticky = [];
+                for (let i = 0; i < cfg.fsCount; i++) {
+                    const fg = makeGrid(mk, rng, sticky);
+                    fg.forEach((col, c) => col.forEach((id, r) => { if (id === 'wild' && !sticky.some(s => s.c === c && s.r === r)) sticky.push({ c, r }); }));
+                    { const w = Math.round(evalLines(mk, fg, bet).total) * cfg.fsMult; out.pay += w; out.bp += w; }
+                }
+            }
+        } else if (mk === 'coins') {
+            const g = makeGrid(mk, rng); out.pay += Math.round(evalLines(mk, g, bet).total);
+            if (count(mk, g, 'coin') >= cfg.hsTrigger) {
+                out.bonus = 1; const held = coinMap(g, rng); hsPlay(held, rng);
+                const t = hsTotal(held, bet); out.pay += t.total; out.bp += t.total; if (t.full) out.big = 1;
+            }
+        } else if (mk === 'totem') {
+            let g = makeGrid(mk, rng), step = 0;
+            for (;;) {
+                const ev = evalLines(mk, g, bet); if (ev.total <= 0 || step > 60) break;
+                out.pay += Math.round(ev.total) * cfg.ladder[Math.min(step, cfg.ladder.length - 1)];
+                g = cascade(mk, g, uniqCells(ev.wins), rng); step++;
+            }
+            out.steps = step; if (step >= 2) out.bonus = 1;
+        } else {
+            const g = makeGrid(mk, rng); out.pay += Math.round(evalWays(mk, g, bet).total);
+            if (count(mk, g, 'bonus') >= 3) { out.bonus = 1; const w = WHEEL[Math.floor(rng() * WHEEL.length)] * bet; out.pay += w; out.bp += w; }
+        }
+        return out;
+    }
+    return { COLS, ROWS, LINES, CFG, COIN_TABLE, JACKPOTS, WHEEL, makeGrid, count, evalLines, evalWays, cascade, uniqCells,
+             rollCoin, coinMap, hsRespin, hsCount, hsTotal, hsPlay, playRound };
+})();
+
+    </script>
 
     <!-- JAVASCRIPT GAME LOGIC -->
     <script>
@@ -732,7 +935,7 @@
             neon: {
                 name: 'Neon Vegas',
                 icon: '🎬',
-                subtitle: '5 Linhas Clássicas & Free Spins 2x',
+                subtitle: '5 Linhas & Free Spins 2x com Wilds Fixos',
                 symbols: [
                     { id: 's7', name: '777', icon: '🎰', mult: 50 },
                     { id: 'dia', name: 'Diamante', icon: '💎', mult: 25 },
@@ -746,7 +949,7 @@
             coins: {
                 name: 'Gold Coin Grab',
                 icon: '💰',
-                subtitle: 'Hold & Spin + 4 Jackpots Progressivos',
+                subtitle: 'Hold & Spin de verdade + 4 Jackpots',
                 symbols: [
                     { id: 'bar_gold', name: 'Barra Ouro', icon: '👑', mult: 40 },
                     { id: 'bag', name: 'Saco de Moedas', icon: '💰', mult: 20 },
@@ -759,7 +962,7 @@
             totem: {
                 name: 'Totem Avalanche',
                 icon: '🗿',
-                subtitle: 'Símbolos Explodem com Cascata até 10x',
+                subtitle: 'Cascata: símbolos explodem e o multiplicador sobe até 10x',
                 symbols: [
                     { id: 't_gold', name: 'Totem Ouro', icon: '🗿', mult: 35 },
                     { id: 't_red', name: 'Máscara Vermelha', icon: '👺', mult: 20 },
@@ -808,12 +1011,6 @@
             history: [],
             spinCount: 0,
             timedBonusCounter: 60,
-            jackpots: {
-                mini: 1000,
-                minor: 5000,
-                major: 25000,
-                grand: 100000
-            },
             gridState: [], // 5 cols x 3 rows
             avalancheMultiplier: 1,
             holdAndSpinActive: false,
@@ -878,13 +1075,16 @@
             document.getElementById('chipsDisplay').textContent = state.chips.toLocaleString('pt-BR');
             document.getElementById('betDisplay').textContent = state.bet.toLocaleString('pt-BR');
             document.getElementById('levelBadge').textContent = 'N' + state.level;
+            refreshMachineLocks();
             document.getElementById('xpText').textContent = `${state.xp}/${state.xpMax}`;
             document.getElementById('xpBar').style.width = `${Math.min(100, (state.xp / state.xpMax) * 100)}%`;
 
-            document.getElementById('jpGrand').textContent = Math.floor(state.jackpots.grand).toLocaleString('pt-BR');
-            document.getElementById('jpMajor').textContent = Math.floor(state.jackpots.major).toLocaleString('pt-BR');
-            document.getElementById('jpMinor').textContent = Math.floor(state.jackpots.minor).toLocaleString('pt-BR');
-            document.getElementById('jpMini').textContent = Math.floor(state.jackpots.mini).toLocaleString('pt-BR');
+            const J = SlotMath.JACKPOTS;
+            document.getElementById('jpGrand').textContent = (J.GRAND * state.bet).toLocaleString('pt-BR');
+            document.getElementById('jpMajor').textContent = (J.MAJOR * state.bet).toLocaleString('pt-BR');
+            document.getElementById('jpMinor').textContent = (J.MINOR * state.bet).toLocaleString('pt-BR');
+            document.getElementById('jpMini').textContent = (J.MINI * state.bet).toLocaleString('pt-BR');
+            document.getElementById('jackpotContainer').classList.toggle('hidden', state.currentMachine !== 'coins');
 
             // Quests badge indicator
             const hasClaimable = state.quests.some(q => q.current >= q.target && !q.done);
@@ -913,6 +1113,8 @@
                 setAnnouncer(`🎉 SUBIU PARA O NÍVEL ${state.level}! RECOMPENSA DE ${state.level * 2500} FICHAS!`, true);
                 
                 // Unlock relic on level up
+                const newM = Object.keys(MACHINE_UNLOCK).find(k => MACHINE_UNLOCK[k] === state.level);
+                if (newM) setAnnouncer(`🎉 NÍVEL ${state.level}! NOVA MÁQUINA LIBERADA: ${MACHINES[newM].name.toUpperCase()}!`, true);
                 const lockedRelic = RELICS.find(r => !r.unlocked);
                 if (lockedRelic) {
                     lockedRelic.unlocked = true;
@@ -960,8 +1162,17 @@
         }
 
         /* --- SWITCH MACHINE --- */
+        const MACHINE_UNLOCK = { neon: 1, coins: 2, totem: 3, zeus: 5 };
+        function refreshMachineLocks() {
+            document.querySelectorAll('.machine-tab').forEach(tab => {
+                const need = MACHINE_UNLOCK[tab.dataset.machine] || 1;
+                if (state.level < need) tab.dataset.lock = need; else delete tab.dataset.lock;
+            });
+        }
         function switchMachine(machKey) {
             if (state.isSpinning) return;
+            const need = MACHINE_UNLOCK[machKey] || 1;
+            if (state.level < need) { setAnnouncer(`🔒 ${MACHINES[machKey].name.toUpperCase()} LIBERA NO NÍVEL ${need}. Continue jogando para subir de nível!`); return; }
             state.currentMachine = machKey;
             
             document.querySelectorAll('.machine-tab').forEach(tab => {
@@ -980,6 +1191,8 @@
             // Toggle specific machine overlays
             document.getElementById('avalancheMultBox').classList.toggle('hidden', machKey !== 'totem');
             document.getElementById('respinBox').classList.toggle('hidden', machKey !== 'coins' || !state.holdAndSpinActive);
+            document.getElementById('avalancheVal').textContent = '1x';
+            updateUI();
 
             clearPaylines();
             initReelsGrid();
@@ -995,6 +1208,22 @@
             state.autoSpin = false;
             const el = document.getElementById('autoSpinStatus');
             if (el) el.textContent = 'OFF';
+        }
+
+        /* --- DESENHO DAS CASAS --- */
+        function fmtCompact(n) {
+            if (n >= 1000000) return (n / 1000000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'M';
+            if (n >= 10000) return (n / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k';
+            return n.toLocaleString('pt-BR');
+        }
+        function tileHTML(sym) {
+            let extra = '';
+            if (sym.isCoin && sym.coin) {
+                const jp = sym.coin.jp;
+                extra = `<span class="coin-val${jp ? ' coin-jp' : ''}">${jp || fmtCompact(sym.coin.m * state.bet)}</span>`;
+            }
+            return `<span class="symbol-icon text-3xl md:text-4xl filter drop-shadow">${sym.icon}</span>
+                        <span class="symbol-name text-[9px] md:text-[10px] text-amber-300/80 font-bold uppercase mt-1 leading-none">${sym.name}</span>${extra}`;
         }
 
         /* --- SPIN MECHANICS --- */
@@ -1019,9 +1248,6 @@
             } else {
                 // Deduct Bet
                 state.chips -= state.bet;
-                // Incremental jackpots pool
-                state.jackpots.grand += state.bet * 0.01;
-                state.jackpots.major += state.bet * 0.02;
             }
             updateUI();
 
@@ -1034,22 +1260,14 @@
 
             const cols = document.querySelectorAll('.reel-column');
 
-            // Gera o resultado (lógica e probabilidades originais, sem alteração)
-            const newGrid = [];
-            for (let c = 0; c < 5; c++) {
-                const colSyms = [];
-                for (let r = 0; r < 3; r++) {
-                    // Handle Sticky Wilds if active
-                    if (state.freeSpinsLeft > 0 && state.stickyWilds.some(sw => sw.c === c && sw.r === r)) {
-                        colSyms.push(Object.assign({}, MACHINES[state.currentMachine].symbols.find(s => s.isWild) || getRandomSymbol(state.currentMachine)));
-                    } else {
-                        colSyms.push(getRandomSymbol(state.currentMachine));
-                    }
-                }
-                newGrid.push(colSyms);
-            }
-            newGrid.forEach(col => col.forEach(sym => {
-                if (sym.isCoin) sym.coinVal = state.bet * [1, 2, 5, 10, 20][Math.floor(Math.random() * 5)];
+            // Gera o resultado com o motor matemático (pesos e prêmios documentados em SlotMath)
+            const mk = state.currentMachine;
+            const idGrid = SlotMath.makeGrid(mk, Math.random, isFreeSpin ? state.stickyWilds : []);
+            state.coinMap = mk === 'coins' ? SlotMath.coinMap(idGrid, Math.random) : null;
+            const newGrid = idGrid.map((col, c) => col.map((id, r) => {
+                const s = Object.assign({}, MACHINES[mk].symbols.find(x => x.id === id));
+                if (s.isCoin) s.coin = state.coinMap[c][r];
+                return s;
             }));
             if (state.spinWasFree) {
                 // Wilds que caem nos Free Spins ficam fixos até o fim da rodada
@@ -1057,6 +1275,7 @@
                     if (sym.isWild && !state.stickyWilds.some(sw => sw.c === c && sw.r === r)) state.stickyWilds.push({ c, r });
                 }));
             }
+            document.getElementById('avalancheVal').textContent = '1x';
 
             // --- Só visual: tempos de parada (esquerda -> direita) e suspense no último rolo ---
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1070,11 +1289,7 @@
                 stopAt.push(t);
             }
 
-            const makeTileHTML = (sym) => {
-                const cv = sym.isCoin ? `<span class="text-[9px] font-mono font-bold text-yellow-300 leading-tight">${sym.coinVal}</span>` : '';
-                return `<span class="symbol-icon text-3xl md:text-4xl filter drop-shadow">${sym.icon}</span>
-                        <span class="symbol-name text-[9px] md:text-[10px] text-amber-300/80 font-bold uppercase mt-1 leading-none">${sym.name}</span>${cv}`;
-            };
+            const makeTileHTML = (sym) => tileHTML(sym);
 
             // Monta a faixa de símbolos que desce em cada rolo
             const overlays = [];
@@ -1123,7 +1338,7 @@
                     const tiles = col.querySelectorAll(':scope > .symbol-tile');
                     tiles.forEach((tile, rIdx) => {
                         const sym = newGrid[cIdx][rIdx];
-                        tile.className = 'symbol-tile rounded-xl p-2 flex flex-col items-center justify-center h-20 md:h-24 select-none relative';
+                        tile.className = TILE_CLASS + (sym.isCoin ? ' coin-held' : '') + (state.spinWasFree && state.stickyWilds.some(sw => sw.c === cIdx && sw.r === rIdx) ? ' sticky-wild' : '');
                         tile.innerHTML = makeTileHTML(sym);
                     });
                     col.classList.remove('rolling');
@@ -1159,18 +1374,22 @@
         }
 
         /* --- EVALUATION & WIN LOGIC --- */
-        function evaluateSpinOutcome() {
+        async function evaluateSpinOutcome() {
             let totalWin = 0;
             const mach = state.currentMachine;
 
-            if (mach === 'neon') {
-                totalWin = evaluate5Paylines();
-            } else if (mach === 'coins') {
-                totalWin = evaluateCoinsHoldAndSpin();
-            } else if (mach === 'totem') {
-                totalWin = evaluateTotemAvalanche();
-            } else if (mach === 'zeus') {
-                totalWin = evaluateZeus243Ways();
+            try {
+                if (mach === 'neon') {
+                    totalWin = evalNeon();
+                } else if (mach === 'coins') {
+                    totalWin = await evalCoins();
+                } else if (mach === 'totem') {
+                    totalWin = await evalTotem();
+                } else if (mach === 'zeus') {
+                    totalWin = evalZeus();
+                }
+            } catch (e) {
+                console.error('Erro ao avaliar o giro:', e);
             }
 
             totalWin = Math.round(totalWin);
@@ -1211,129 +1430,183 @@
             }
         }
 
-        /* 1. NEON VEGAS (5 LINES) */
-        function evaluate5Paylines() {
-            const lines = [
-                [[0,1], [1,1], [2,1], [3,1], [4,1]], // Center line
-                [[0,0], [1,0], [2,0], [3,0], [4,0]], // Top line
-                [[0,2], [1,2], [2,2], [3,2], [4,2]], // Bottom line
-                [[0,0], [1,1], [2,2], [3,1], [4,0]], // V shape
-                [[0,2], [1,1], [2,0], [3,1], [4,2]]  // Inverted V
-            ];
-
-            let winSum = 0;
-            lines.forEach((line, lIdx) => {
-                const firstSym = state.gridState[line[0][0]][line[0][1]];
-                let matchCount = 1;
-
-                for (let i = 1; i < line.length; i++) {
-                    const sym = state.gridState[line[i][0]][line[i][1]];
-                    if (sym.id === firstSym.id || sym.isWild || firstSym.isWild) {
-                        matchCount++;
-                    } else {
-                        break;
-                    }
-                }
-
-                if (matchCount >= 3) {
-                    const pay = (firstSym.mult || 10) * matchCount * (state.bet / 10);
-                    winSum += pay;
-                    highlightPayline(line);
-                }
+        /* 1. NEON VEGAS (5 LINHAS + FREE SPINS) */
+        function currentIdGrid() { return state.gridState.map(col => col.map(s => s.id)); }
+        function showLineWins(ev) { ev.wins.forEach(w => highlightPayline(w.cells)); }
+        function highlightCells(cells) {
+            cells.forEach(p => {
+                const tile = document.querySelector(`.symbol-tile[data-col="${p[0]}"][data-row="${p[1]}"]`);
+                if (tile) tile.classList.add('winning');
             });
+        }
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const quick = () => state.turbo || reducedMotion();
 
-            // Check Scatters for Free Spins
-            let scatterCount = 0;
-            for (let c = 0; c < 5; c++) {
-                for (let r = 0; r < 3; r++) {
-                    if (state.gridState[c][r].isScatter) scatterCount++;
-                }
-            }
-
-            if (scatterCount >= 3 && state.freeSpinsLeft === 0) {
-                state.freeSpinsLeft = 8;
+        function evalNeon() {
+            const g = currentIdGrid();
+            const ev = SlotMath.evalLines('neon', g, state.bet);
+            showLineWins(ev);
+            // 3+ Scatters ativam Free Spins (não reativa durante os próprios Free Spins)
+            if (SlotMath.count('neon', g, 'scatter') >= SlotMath.CFG.neon.fsTrigger && !state.spinWasFree) {
+                state.freeSpinsLeft = SlotMath.CFG.neon.fsCount;
                 updateQuestProgress(3, 1);
                 setAnnouncer('⭐ 8 FREE SPINS ATIVADOS COM MULTIPLICADOR 2X!', true);
             }
-
-            return winSum;
+            return ev.total;
         }
 
-        /* 2. HOLD & SPIN COINS */
-        function evaluateCoinsHoldAndSpin() {
-            let coinsCount = 0;
-            let coinValuesSum = 0;
+        /* 2. GOLD COIN GRAB: HOLD & SPIN DE VERDADE */
+        async function evalCoins() {
+            const g = currentIdGrid();
+            const ev = SlotMath.evalLines('coins', g, state.bet);
+            showLineWins(ev);
+            let total = ev.total;
+            const n = SlotMath.count('coins', g, 'coin');
+            if (n >= SlotMath.CFG.coins.hsTrigger) {
+                total += await runHoldAndSpin();
+            } else if (n >= 4) {
+                setAnnouncer(`🪙 ${n} MOEDAS! FALTARAM ${SlotMath.CFG.coins.hsTrigger - n} PARA O HOLD & SPIN.`);
+            }
+            return total;
+        }
 
-            for (let c = 0; c < 5; c++) {
-                for (let r = 0; r < 3; r++) {
-                    const sym = state.gridState[c][r];
-                    if (sym.isCoin) {
-                        coinsCount++;
-                        coinValuesSum += (sym.coinVal || state.bet);
-                    }
+        const TILE_CLASS = 'symbol-tile rounded-xl p-2 flex flex-col items-center justify-center h-20 md:h-24 select-none relative';
+        function getTile(c, r) { return document.querySelector(`.reel-column[data-col="${c}"] > .symbol-tile[data-row="${r}"]`); }
+        function coinSymbol(coin) { return Object.assign({}, MACHINES.coins.symbols.find(s => s.isCoin), { coin }); }
+        function setRespins(n) { const el = document.getElementById('respinVal'); if (el) el.textContent = n; }
+
+        async function runHoldAndSpin() {
+            const cfg = SlotMath.CFG.coins, held = state.coinMap, bet = state.bet;
+            const fast = quick();
+            const box = document.getElementById('respinBox');
+            state.holdAndSpinActive = true;
+            box.classList.remove('hidden');
+            updateQuestProgress(3, 1);
+            sfx.playBigWin();
+            spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 50, 'gold');
+            setAnnouncer('💰 HOLD & SPIN! AS MOEDAS FICAM TRAVADAS. VOCÊ TEM 3 RESPINS, E CADA MOEDA NOVA REINICIA A CONTAGEM!', true);
+            // trava as moedas e apaga as demais casas
+            for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) {
+                const t = getTile(c, r); if (!t) continue;
+                if (held[c][r]) t.className = TILE_CLASS + ' coin-held';
+                else t.className = TILE_CLASS + ' hs-empty';
+            }
+            let respins = cfg.hsRespins; setRespins(respins);
+            await sleep(fast ? 500 : 1500);
+            const decor = MACHINES.coins.symbols.filter(s => !s.isCoin);
+            while (respins > 0 && SlotMath.hsCount(held) < 15) {
+                // giro visual só nas casas vazias
+                const empties = [];
+                for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) if (!held[c][r]) empties.push(getTile(c, r));
+                const flick = setInterval(() => {
+                    empties.forEach(t => { const s = decor[Math.floor(Math.random() * decor.length)]; t.innerHTML = tileHTML(s); });
+                    sfx.playSpin();
+                }, 90);
+                await sleep(fast ? 350 : 900);
+                clearInterval(flick);
+                const added = SlotMath.hsRespin(held, Math.random);
+                // casas vazias voltam a ficar apagadas e vazias
+                for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) if (!held[c][r]) { const t = getTile(c, r); if (t) { t.className = TILE_CLASS + ' hs-empty'; t.innerHTML = ''; } }
+                added.forEach(a => {
+                    const t = getTile(a.c, a.r);
+                    t.className = TILE_CLASS + ' coin-held';
+                    t.innerHTML = tileHTML(coinSymbol(a.coin));
+                    if (t.animate && !reducedMotion()) t.animate([{ transform: 'scale(1.5)', opacity: .3 }, { transform: 'scale(1)', opacity: 1 }], { duration: 300, easing: 'ease-out' });
+                });
+                if (added.length) {
+                    sfx.playCoin();
+                    respins = cfg.hsRespins;
+                    setAnnouncer(`🪙 +${added.length} MOEDA${added.length > 1 ? 'S' : ''}! RESPINS VOLTAM PARA ${respins}. (${SlotMath.hsCount(held)}/15 CASAS)`, true);
+                } else {
+                    respins--;
+                    setAnnouncer(`💰 SEM MOEDA NOVA... RESPINS RESTANTES: ${respins}`);
+                }
+                setRespins(respins);
+                await sleep(fast ? 250 : 650);
+            }
+            const t = SlotMath.hsTotal(held, bet);
+            document.getElementById('winDisplay').textContent = Math.round(t.total).toLocaleString('pt-BR');
+            if (t.full) {
+                sfx.playBigWin();
+                spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 120, 'gold');
+                setAnnouncer(`👑 GRAND JACKPOT! GRADE CHEIA! ${Math.round(t.total).toLocaleString('pt-BR')} FICHAS!`, true);
+            } else {
+                setAnnouncer(`💰 FIM DO HOLD & SPIN: ${SlotMath.hsCount(held)} MOEDAS = ${Math.round(t.total).toLocaleString('pt-BR')} FICHAS!`, true);
+            }
+            await sleep(fast ? 600 : 1800);
+            state.holdAndSpinActive = false;
+            box.classList.add('hidden');
+            return t.total;
+        }
+
+        /* 3. TOTEM AVALANCHE: CASCATA DE VERDADE */
+        function renderGridFromIds(ids, animate, oldKeep) {
+            const mk = state.currentMachine;
+            state.gridState = ids.map(col => col.map(id => Object.assign({}, MACHINES[mk].symbols.find(s => s.id === id))));
+            for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) {
+                const t = getTile(c, r); if (!t) continue;
+                t.className = TILE_CLASS; t.innerHTML = tileHTML(state.gridState[c][r]);
+                if (animate && t.animate && !reducedMotion()) {
+                    const shift = animate[c][r]; // quantas casas o símbolo desceu
+                    if (shift > 0) t.animate([{ transform: `translateY(${-shift * (t.offsetHeight + 8)}px)`, opacity: .4 }, { transform: 'translateY(0)', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3,.7,.4,1)' });
                 }
             }
-
-            // Check if Hold & Spin Triggered (6+ Coins)
-            if (coinsCount >= 6) {
-                updateQuestProgress(3, 1);
-                sfx.playBigWin();
-                setAnnouncer('💰 RECURSO HOLD & SPIN ATIVADO COM COIN BONUS!', true);
-                coinValuesSum += state.jackpots.mini; // Bonus boost
-            }
-
-            return coinValuesSum > 0 ? coinValuesSum : evaluate5Paylines();
         }
 
-        /* 3. TOTEM AVALANCHE (CASCADING WIN) */
-        function evaluateTotemAvalanche() {
-            let baseWin = evaluate5Paylines();
-            if (baseWin > 0) {
-                state.avalancheMultiplier = Math.min(10, state.avalancheMultiplier + 1);
-                document.getElementById('avalancheVal').textContent = state.avalancheMultiplier + 'x';
-                return baseWin * state.avalancheMultiplier;
-            } else {
-                state.avalancheMultiplier = 1;
-                document.getElementById('avalancheVal').textContent = '1x';
-                return 0;
+        async function evalTotem() {
+            const mk = 'totem', ladder = SlotMath.CFG.totem.ladder, fast = quick();
+            let grid = currentIdGrid(), step = 0, total = 0;
+            const multEl = document.getElementById('avalancheVal');
+            multEl.textContent = '1x'; state.avalancheMultiplier = 1;
+            while (step < 60) {
+                const ev = SlotMath.evalLines(mk, grid, state.bet);
+                if (ev.total <= 0) break;
+                const m = ladder[Math.min(step, ladder.length - 1)];
+                state.avalancheMultiplier = m; multEl.textContent = m + 'x';
+                const win = Math.round(ev.total) * m;
+                total += win;
+                clearPaylines(); showLineWins(ev);
+                document.getElementById('winDisplay').textContent = total.toLocaleString('pt-BR');
+                if (step === 0) { sfx.playWin(); setAnnouncer(`🗿 PRÊMIO DE ${win.toLocaleString('pt-BR')}! OS SÍMBOLOS VÃO EXPLODIR...`, true); }
+                else { sfx.playBigWin(); updateQuestProgress(3, step === 1 ? 1 : 0); setAnnouncer(`🗿 CASCATA ${step}! MULTIPLICADOR ${m}x: +${win.toLocaleString('pt-BR')} FICHAS`, true); }
+                await sleep(fast ? 500 : 1100);
+                const cells = SlotMath.uniqCells(ev.wins);
+                cells.forEach(p => {
+                    const t = getTile(p[0], p[1]);
+                    if (t) { t.classList.add('exploding'); const rc = t.getBoundingClientRect(); spawnParticles(rc.left + rc.width / 2, rc.top + rc.height / 2, 8, 'gold'); }
+                });
+                sfx.playCoin();
+                await sleep(fast ? 250 : 480);
+                const next = SlotMath.cascade(mk, grid, cells, Math.random);
+                // calcula o quanto cada símbolo desceu (novos entram de cima)
+                const shifts = [];
+                for (let c = 0; c < 5; c++) {
+                    const removed = {}; cells.forEach(p => { if (p[0] === c) removed[p[1]] = 1; });
+                    const keptRows = []; for (let r = 0; r < 3; r++) if (!removed[r]) keptRows.push(r);
+                    const nNew = 3 - keptRows.length; shifts.push([]);
+                    for (let nr = 0; nr < 3; nr++) shifts[c].push(nr < nNew ? nNew : nr - keptRows[nr - nNew]);
+                }
+                clearPaylines();
+                renderGridFromIds(next, shifts);
+                grid = next; step++;
+                await sleep(fast ? 300 : 650);
             }
+            if (step >= 2) setAnnouncer(`🗿 AVALANCHE DE ${step} CASCATAS! TOTAL ${total.toLocaleString('pt-BR')} FICHAS!`, true);
+            return total;
         }
 
         /* 4. ZEUS 243 WAYS */
-        function evaluateZeus243Ways() {
-            let totalWin = 0;
-            let bonusWheelTriggered = 0;
-
-            for (let c = 0; c < 5; c++) {
-                for (let r = 0; r < 3; r++) {
-                    if (state.gridState[c][r].isBonus) bonusWheelTriggered++;
-                }
-            }
-
-            if (bonusWheelTriggered >= 3) {
+        function evalZeus() {
+            const g = currentIdGrid();
+            const ev = SlotMath.evalWays('zeus', g, state.bet);
+            ev.wins.forEach(w => highlightCells(w.cells));
+            if (SlotMath.count('zeus', g, 'bonus') >= 3) {
                 updateQuestProgress(3, 1);
+                state.wheelBet = state.bet;
                 openWheelModal();
             }
-
-            // Basic 243 ways evaluation (reel 1 through reel 5 left-to-right matching)
-            const reel1 = state.gridState[0];
-            reel1.forEach(sym1 => {
-                let ways = 1;
-                for (let col = 1; col < 5; col++) {
-                    const matches = state.gridState[col].filter(s => s.id === sym1.id || s.isWild);
-                    if (matches.length > 0) {
-                        ways *= matches.length;
-                    } else {
-                        if (col < 3) ways = 0;
-                        break;
-                    }
-                }
-                if (ways > 0) {
-                    totalWin += (sym1.mult || 5) * ways * (state.bet / 20);
-                }
-            });
-
-            return totalWin;
+            return ev.total;
         }
 
         /* --- PAYLINE VISUAL HIGHLIGHTING --- */
@@ -1365,22 +1638,16 @@
 
         function clearPaylines() {
             document.getElementById('paylinesSvg').innerHTML = '';
-            document.querySelectorAll('.symbol-tile').forEach(t => t.classList.remove('winning'));
+            document.querySelectorAll('.symbol-tile').forEach(t => t.classList.remove('winning', 'exploding'));
         }
 
         /* --- WHEEL OF OLYMPUS MINIGAME --- */
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wheelCtx = wheelCanvas ? wheelCanvas.getContext('2d') : null;
-        const wheelSlices = [
-            { label: '500 Fichas', val: 500, color: '#b45309' },
-            { label: '1.000 Fichas', val: 1000, color: '#d97706' },
-            { label: '2.500 Fichas', val: 2500, color: '#f59e0b' },
-            { label: '5.000 Fichas', val: 5000, color: '#fbbf24' },
-            { label: 'MINI JACKPOT', val: 10000, color: '#ef4444' },
-            { label: '15.000 Fichas', val: 15000, color: '#10b981' },
-            { label: 'MAJOR JACKPOT', val: 25000, color: '#3b82f6' },
-            { label: '50.000 Fichas', val: 50000, color: '#8b5cf6' }
-        ];
+        // Prêmios da roda = múltiplos da aposta (SlotMath.WHEEL), então valem o mesmo em qualquer aposta
+        const WHEEL_COLORS = ['#b45309', '#d97706', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ef4444', '#0e7490'];
+        function wheelLabel(m) { return m >= 250 ? 'MAJOR ' + m + 'x' : m >= 100 ? 'MINI ' + m + 'x' : m + 'x'; }
+        const wheelSlices = SlotMath.WHEEL.map((m, i) => ({ label: wheelLabel(m), mult: m, color: WHEEL_COLORS[i % WHEEL_COLORS.length] }));
 
         let wheelAngle = 0;
         let isWheelSpinning = false;
@@ -1411,7 +1678,7 @@
                 wheelCtx.rotate(angle + sliceAngle / 2);
                 wheelCtx.textAlign = 'right';
                 wheelCtx.fillStyle = '#ffffff';
-                wheelCtx.font = 'bold 11px Inter, sans-serif';
+                wheelCtx.font = 'bold 10px Inter, sans-serif';
                 wheelCtx.fillText(slice.label, radius - 15, 4);
                 wheelCtx.restore();
             });
@@ -1463,11 +1730,14 @@
                     const index = Math.floor(normalized / sliceAngle) % numSlices;
                     const winPrize = wheelSlices[index];
 
-                    state.chips += winPrize.val;
+                    const prizeChips = winPrize.mult * (state.wheelBet || state.bet);
+                    state.chips += prizeChips;
+                    if (state.history[0]) { state.history[0].win += prizeChips; state.history[0].bal = state.chips; }
                     updateUI();
+                    renderScore();
                     saveState();
-                    document.getElementById('winDisplay').textContent = winPrize.val.toLocaleString('pt-BR');
-                    setAnnouncer(`⚡ RODA DO OLIMPO: VOCÊ GANHOU ${winPrize.label.toUpperCase()}!`, true);
+                    document.getElementById('winDisplay').textContent = prizeChips.toLocaleString('pt-BR');
+                    setAnnouncer(`⚡ RODA DO OLIMPO: ${winPrize.label} = ${prizeChips.toLocaleString('pt-BR')} FICHAS!`, true);
                     sfx.playBigWin();
                     spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 60, 'gold');
 
@@ -1544,6 +1814,56 @@
             });
         }
 
+        /* --- REGRAS, TABELA DE PAGAMENTOS E RETORNO (RTP) --- */
+        // Retorno teórico medido por simulação (ferramentas/sloto-sim.js). Não conta bônus de nível, missões, roda de fichas grátis nem recargas.
+        const RTP_INFO = {
+        "neon": {
+                "rtp": "~93,6%",
+                "freq": "Free Spins: 1 a cada ~236 giros; acerta algum prêmio em 39% dos giros"
+        },
+        "coins": {
+                "rtp": "~92,8%",
+                "freq": "Hold & Spin: 1 a cada ~173 giros; Grand (grade cheia): 1 a cada ~26.144 giros"
+        },
+        "totem": {
+                "rtp": "~94,5%",
+                "freq": "2+ cascatas: 1 a cada ~8 giros; 10 cascatas seguidas: 1 a cada ~275.862 giros"
+        },
+        "zeus": {
+                "rtp": "~96,0%",
+                "freq": "Roda do Olimpo: 1 a cada ~135 giros; acerta algum prêmio em 67% dos giros"
+        }
+};
+        function renderPaytable() {
+            const body = document.getElementById('paytableBody');
+            const fx = u => (u / 20).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + 'x';
+            const symRows = (mk, perWay) => {
+                const S = SlotMath.CFG[mk].sym;
+                return '<table class="rtp-table"><thead><tr><th>Símbolo</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody>' +
+                    MACHINES[mk].symbols.filter(s => S[s.id].pay).map(s => `<tr><td>${s.icon} ${s.name}</td>${S[s.id].pay.map(u => '<td>' + fx(u) + '</td>').join('')}</tr>`).join('') +
+                    '</tbody></table><p class="text-[10px] text-slate-400 mt-1">Valores em múltiplos da aposta total' + (perWay ? ', por combinação (way)' : ', por linha premiada') + '. ' + (SlotMath.CFG[mk].sym.wild ? 'WILD substitui qualquer símbolo que paga.' : '') + '</p>';
+            };
+            const rtp = mk => `<p class="mt-2 text-amber-200">📊 Retorno teórico: <strong>${RTP_INFO[mk].rtp}</strong> · ${RTP_INFO[mk].freq}</p>`;
+            const h4 = t => `<h4 class="font-cinzel font-bold text-amber-400 text-sm mb-1">${t}</h4>`;
+            const J = SlotMath.JACKPOTS, C = SlotMath.CFG;
+            body.innerHTML = `
+                <div class="p-2 rounded border border-red-500/50 bg-red-950/50 text-red-200"><strong>🔞 +18 · Só fichas virtuais.</strong> Não existe dinheiro real, compra, venda, saque ou prêmio fora do jogo.</div>
+                <div>${h4('🎬 1. Neon Vegas (5 linhas)')}
+                    <p>Paga da esquerda para a direita em 5 linhas fixas. 3 ou mais ⭐ Scatter em qualquer lugar ativam ${C.neon.fsCount} Free Spins com ganhos 2x, e os Wilds que aparecem ficam fixos até o fim.</p>
+                    ${symRows('neon')}${rtp('neon')}</div>
+                <div>${h4('💰 2. Gold Coin Grab (Hold & Spin)')}
+                    <p>Com ${C.coins.hsTrigger} ou mais 🪙 Moedas na tela começa o Hold & Spin: as moedas ficam travadas e você ganha ${C.coins.hsRespins} respins. Cada moeda nova trava e reinicia os respins para ${C.coins.hsRespins}. Quando acabam, você leva a soma dos valores das moedas. Moedas MINI (${J.MINI}x), MINOR (${J.MINOR}x) e MAJOR (${J.MAJOR}x) são jackpots. Encher as 15 casas paga o GRAND de ${J.GRAND}x a aposta, além das moedas.</p>
+                    ${symRows('coins')}${rtp('coins')}</div>
+                <div>${h4('🗿 3. Totem Avalanche (cascata)')}
+                    <p>Os símbolos premiados explodem, os de cima caem e novos entram, repetindo até não haver mais prêmio. A cada cascata premiada no mesmo giro o multiplicador sobe: ${C.totem.ladder.join('x → ')}x. Chegar a 10x exige 10 cascatas seguidas e é muito raro. Um giro sem prêmio começa de novo em 1x.</p>
+                    ${symRows('totem')}${rtp('totem')}</div>
+                <div>${h4('⚡ 4. Zeus 243 Ways')}
+                    <p>Paga por combinações em 243 caminhos, da esquerda para a direita, com no mínimo 3 rolos seguidos. 3 ou mais 🌀 Bônus em qualquer lugar abrem a Roda do Olimpo (prêmios de ${Math.min(...SlotMath.WHEEL)}x a ${Math.max(...SlotMath.WHEEL)}x a aposta).</p>
+                    ${symRows('zeus', true)}${rtp('zeus')}</div>
+                <p class="text-[10px] text-slate-400">O retorno é a média de muitos milhões de giros simulados com este mesmo código; em poucas partidas o resultado varia muito. Bônus de nível, missões, bônus de tempo e recarga de fichas não entram nessa conta.</p>`;
+        }
+
+
         /* --- EVENT LISTENERS & INITIALIZATION --- */
         window.onload = function () {
             loadState();
@@ -1601,11 +1921,12 @@
 
             // Header Quick Buttons
             document.getElementById('btnRefill').onclick = () => {
-                state.chips += 50000;
+                if (state.chips >= 2000) { setAnnouncer('Você ainda tem fichas! A recarga grátis só libera quando restarem menos de 2.000.'); return; }
+                state.chips += 20000;
                 sfx.init(); sfx.playCoin();
                 saveState();
                 spawnParticles(window.innerWidth / 2, window.innerHeight / 2, 30, 'gold');
-                setAnnouncer('💰 +50.000 FICHAS ADICIONADAS COM SUCESSO!');
+                setAnnouncer('💰 +20.000 FICHAS VIRTUAIS ADICIONADAS!');
                 updateUI();
             };
 
@@ -1638,6 +1959,7 @@
             };
 
             document.getElementById('btnPaytable').onclick = () => {
+                renderPaytable();
                 document.getElementById('paytableModal').classList.remove('hidden');
             };
 
@@ -1653,6 +1975,21 @@
             });
 
             document.getElementById('btnSpinWheel').onclick = spinWheel;
+
+            // Jogo responsável: lembrete de pausa a cada 30 minutos na página
+            (function pauseReminder() {
+                let minutes = 0;
+                setInterval(() => {
+                    if (document.hidden) return;
+                    minutes++;
+                    if (minutes % 30 !== 0 || document.getElementById('pauseNote')) return;
+                    const n = document.createElement('div');
+                    n.id = 'pauseNote'; n.setAttribute('role', 'alert');
+                    n.innerHTML = `⏰ Você está jogando há ${minutes} minutos. Que tal uma pausa? Lembre: são só fichas virtuais, para diversão. Se jogar virou problema, procure ajuda.<br><button type="button">Entendi</button>`;
+                    n.querySelector('button').onclick = () => n.remove();
+                    document.body.appendChild(n);
+                }, 60000);
+            })();
 
             // Timed Bonus Countdown
             setInterval(() => {
