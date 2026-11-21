@@ -69,6 +69,17 @@
             100% { filter: blur(0px); }
         }
 
+
+        /* Rolos giratórios (efeito visual de suspense) */
+        .reel-column { position: relative; }
+        .reel-column.rolling > .symbol-tile { visibility: hidden; }
+        .reel-overlay { position: absolute; inset: 0; overflow: hidden; z-index: 5; border-radius: 12px; pointer-events: none; }
+        .reel-strip-anim { display: flex; flex-direction: column; will-change: transform; backface-visibility: hidden; }
+        .reel-strip-anim .symbol-tile { flex: 0 0 auto; transition: none; }
+        .reel-column.suspense { animation: reelSuspense 0.45s ease-in-out infinite alternate; border-radius: 12px; }
+        @keyframes reelSuspense { from { box-shadow: 0 0 6px 1px rgba(251,191,36,.35); } to { box-shadow: 0 0 22px 6px rgba(251,191,36,.9); } }
+        .score-panel td, .score-panel th { padding: 2px 6px; }
+
         /* Symbol Tile Style */
         .symbol-tile {
             transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -449,6 +460,21 @@
                 </button>
             </div>
 
+            <!-- PLACAR DE JOGADAS -->
+            <section id="scorePanel" class="score-panel bg-black/50 rounded-xl p-3 border border-amber-900/40" aria-labelledby="scoreTitle">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                    <h2 id="scoreTitle" class="font-cinzel font-bold text-amber-300 text-xs md:text-sm uppercase">📊 Placar das últimas jogadas</h2>
+                    <span style="font-size:12px;color:#cbd5e1">Saldo: <strong id="scoreBalance" class="text-amber-300 font-mono">0</strong></span>
+                </div>
+                <div class="overflow-x-auto">
+                <table style="width:100%;text-align:center;font-family:ui-monospace,monospace;font-size:12px">
+                    <caption style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Histórico das últimas jogadas com aposta, ganho e saldo resultante</caption>
+                    <thead class="text-amber-400 uppercase"><tr><th scope="col">#</th><th scope="col">Aposta</th><th scope="col">Ganho</th><th scope="col">Saldo</th></tr></thead>
+                    <tbody id="scoreBody"><tr><td colspan="4" class="text-slate-400 py-1">Gire para começar o placar.</td></tr></tbody>
+                </table>
+                </div>
+            </section>
+
         </div>
 
     </main>
@@ -779,6 +805,8 @@
             isSpinning: false,
             autoSpin: false,
             turbo: false,
+            history: [],
+            spinCount: 0,
             timedBonusCounter: 60,
             jackpots: {
                 mini: 1000,
@@ -812,6 +840,8 @@
                     state.xpMax = parsed.xpMax ?? Math.floor(500 * Math.pow(1.5, state.level - 1));
                     state.bet = parsed.bet ?? state.bet;
                     if (!(state.chips >= 0)) state.chips = 50000;
+                    if (Array.isArray(parsed.history)) state.history = parsed.history.slice(0, 10);
+                    state.spinCount = parsed.spinCount || 0;
                     if (Array.isArray(parsed.quests)) {
                         parsed.quests.forEach(sq => { const q = state.quests.find(x => x.id === sq.id); if (q) { q.current = sq.current || 0; q.done = !!sq.done; } });
                     }
@@ -832,6 +862,8 @@
                     xp: state.xp,
                     xpMax: state.xpMax,
                     bet: state.bet,
+                    history: state.history,
+                    spinCount: state.spinCount,
                     quests: state.quests.map(q => ({ id: q.id, current: q.current, done: q.done })),
                     relics: RELICS.map(r => r.unlocked)
                 };
@@ -1001,21 +1033,8 @@
             updateQuestProgress(1, 1);
 
             const cols = document.querySelectorAll('.reel-column');
-            const spinDuration = state.turbo ? 200 : 500;
 
-            // Visual spin animation
-            cols.forEach((col, cIdx) => {
-                setTimeout(() => {
-                    col.classList.add('spinning');
-                }, cIdx * (state.turbo ? 40 : 100));
-            });
-
-            // Play spin sound
-            const soundInterval = setInterval(() => {
-                sfx.playSpin();
-            }, 80);
-
-            // Generate target outcome
+            // Gera o resultado (lógica e probabilidades originais, sem alteração)
             const newGrid = [];
             for (let c = 0; c < 5; c++) {
                 const colSyms = [];
@@ -1029,48 +1048,114 @@
                 }
                 newGrid.push(colSyms);
             }
+            newGrid.forEach(col => col.forEach(sym => {
+                if (sym.isCoin) sym.coinVal = state.bet * [1, 2, 5, 10, 20][Math.floor(Math.random() * 5)];
+            }));
+            if (state.spinWasFree) {
+                // Wilds que caem nos Free Spins ficam fixos até o fim da rodada
+                newGrid.forEach((col, c) => col.forEach((sym, r) => {
+                    if (sym.isWild && !state.stickyWilds.some(sw => sw.c === c && sw.r === r)) state.stickyWilds.push({ c, r });
+                }));
+            }
 
-            // Finish Spin sequence
-            setTimeout(() => {
-                clearInterval(soundInterval);
-                if (state.spinWasFree) {
-                    // Wilds que caem nos Free Spins ficam fixos até o fim da rodada
-                    newGrid.forEach((col, c) => col.forEach((sym, r) => {
-                        if (sym.isWild && !state.stickyWilds.some(sw => sw.c === c && sw.r === r)) state.stickyWilds.push({ c, r });
-                    }));
+            // --- Só visual: tempos de parada (esquerda -> direita) e suspense no último rolo ---
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let nSpecial = 0;
+            for (let c = 0; c < 4; c++) newGrid[c].forEach(sym => { if (sym.isScatter) nSpecial++; });
+            const wantSuspense = !reduced && nSpecial >= 2;
+            const stopAt = [];
+            for (let c = 0; c < 5; c++) {
+                let t = reduced ? 220 + c * 70 : (state.turbo ? 280 + c * 90 : 800 + c * 380);
+                if (c === 4 && wantSuspense) t += state.turbo ? 700 : 1500;
+                stopAt.push(t);
+            }
+
+            const makeTileHTML = (sym) => {
+                const cv = sym.isCoin ? `<span class="text-[9px] font-mono font-bold text-yellow-300 leading-tight">${sym.coinVal}</span>` : '';
+                return `<span class="symbol-icon text-3xl md:text-4xl filter drop-shadow">${sym.icon}</span>
+                        <span class="symbol-name text-[9px] md:text-[10px] text-amber-300/80 font-bold uppercase mt-1 leading-none">${sym.name}</span>${cv}`;
+            };
+
+            // Monta a faixa de símbolos que desce em cada rolo
+            const overlays = [];
+            cols.forEach((col, cIdx) => {
+                const firstTiles = col.querySelectorAll('.symbol-tile');
+                const tileH = firstTiles[0].offsetHeight;
+                const gap = firstTiles[1].offsetTop - firstTiles[0].offsetTop - tileH;
+                const step = tileH + gap;
+                const extra = Math.max(6, Math.min(40, Math.round(stopAt[cIdx] / 75)));
+                const ov = document.createElement('div');
+                ov.className = 'reel-overlay';
+                const strip = document.createElement('div');
+                strip.className = 'reel-strip-anim';
+                strip.style.gap = gap + 'px';
+                for (let i = 0; i < extra + 3; i++) {
+                    const sym = i < extra ? getRandomSymbol(state.currentMachine) : newGrid[cIdx][i - extra];
+                    const t = document.createElement('div');
+                    t.className = 'symbol-tile rounded-xl p-2 flex flex-col items-center justify-center select-none relative';
+                    t.style.height = tileH + 'px';
+                    t.innerHTML = makeTileHTML(i < extra ? Object.assign({}, sym, { isCoin: false }) : sym);
+                    strip.appendChild(t);
                 }
-                cols.forEach((col, cIdx) => {
-                    setTimeout(() => {
-                        col.classList.remove('spinning');
-                        sfx.playStop();
+                ov.appendChild(strip);
+                col.appendChild(ov);
+                col.classList.add('rolling');
+                const dist = extra * step;
+                if (strip.animate) {
+                    strip.animate(
+                        [{ transform: `translate3d(0,${-dist}px,0)` }, { transform: 'translate3d(0,0,0)' }],
+                        { duration: stopAt[cIdx], easing: 'cubic-bezier(.3,.6,.35,1)', fill: 'forwards' }
+                    );
+                } else {
+                    strip.style.transform = `translate3d(0,${-dist}px,0)`;
+                }
+                overlays.push(ov);
+            });
 
-                        // Render outcome symbols into DOM
-                        const tiles = col.querySelectorAll('.symbol-tile');
-                        tiles.forEach((tile, rIdx) => {
-                            const sym = newGrid[cIdx][rIdx];
-                            tile.className = 'symbol-tile rounded-xl p-2 flex flex-col items-center justify-center h-20 md:h-24 select-none relative';
-                            
-                            let coinValHTML = '';
-                            if (sym.isCoin) {
-                                const coinVal = state.bet * [1, 2, 5, 10, 20][Math.floor(Math.random() * 5)];
-                                sym.coinVal = coinVal;
-                                coinValHTML = `<span class="text-[9px] font-mono font-bold text-yellow-300 leading-tight">${coinVal}</span>`;
-                            }
+            // Som de giro enquanto houver rolo girando
+            const soundInterval = setInterval(() => { sfx.playSpin(); }, 80);
 
-                            tile.innerHTML = `
-                                <span class="symbol-icon text-3xl md:text-4xl filter drop-shadow">${sym.icon}</span>
-                                <span class="symbol-name text-[9px] md:text-[10px] text-amber-300/80 font-bold uppercase mt-1 leading-none">${sym.name}</span>
-                                ${coinValHTML}
-                            `;
-                        });
+            cols.forEach((col, cIdx) => {
+                const stopOne = () => {
+                    sfx.playStop();
+                    col.classList.remove('suspense');
+                    // Renderiza os símbolos reais do resultado
+                    const tiles = col.querySelectorAll(':scope > .symbol-tile');
+                    tiles.forEach((tile, rIdx) => {
+                        const sym = newGrid[cIdx][rIdx];
+                        tile.className = 'symbol-tile rounded-xl p-2 flex flex-col items-center justify-center h-20 md:h-24 select-none relative';
+                        tile.innerHTML = makeTileHTML(sym);
+                    });
+                    col.classList.remove('rolling');
+                    overlays[cIdx].remove();
+                    if (cIdx === 4) {
+                        clearInterval(soundInterval);
+                        state.gridState = newGrid;
+                        evaluateSpinOutcome();
+                    }
+                };
+                if (cIdx === 4 && wantSuspense) {
+                    // suspense: brilho no último rolo nos instantes finais
+                    setTimeout(() => col.classList.add('suspense'), Math.max(0, stopAt[4] - (state.turbo ? 900 : 1900)));
+                    setTimeout(() => setAnnouncer('⭐ SUSPENSE... O ÚLTIMO ROLO ESTÁ PARANDO!', true), Math.max(0, stopAt[3]));
+                }
+                setTimeout(stopOne, stopAt[cIdx]);
+            });
+        }
 
-                        if (cIdx === 4) {
-                            state.gridState = newGrid;
-                            evaluateSpinOutcome();
-                        }
-                    }, cIdx * (state.turbo ? 50 : 120));
-                });
-            }, spinDuration);
+        /* --- PLACAR DAS JOGADAS --- */
+        function recordScore(win) {
+            state.history.unshift({ n: ++state.spinCount, bet: state.spinWasFree ? 0 : state.bet, free: !!state.spinWasFree, win: win, bal: state.chips });
+            if (state.history.length > 10) state.history.length = 10;
+            renderScore();
+        }
+
+        function renderScore() {
+            const body = document.getElementById('scoreBody');
+            const fmt = v => v.toLocaleString('pt-BR');
+            document.getElementById('scoreBalance').textContent = fmt(state.chips);
+            if (!state.history.length) return;
+            body.innerHTML = state.history.map(h => `<tr class="${h.win > 0 ? 'text-green-400' : 'text-slate-300'}"><td>${h.n}</td><td>${h.free ? 'GRÁTIS' : fmt(h.bet)}</td><td>${h.win > 0 ? '+' + fmt(h.win) : '0'}</td><td class="font-bold">${fmt(h.bal)}</td></tr>`).join('');
         }
 
         /* --- EVALUATION & WIN LOGIC --- */
@@ -1111,6 +1196,7 @@
                 setAnnouncer('🎬 CONTINUE GIRANDO! A PRÓXIMA TELA PODE SER SUA!');
             }
 
+            recordScore(totalWin);
             state.isSpinning = false;
             setControlsLocked(false);
             updateUI();
@@ -1461,7 +1547,7 @@
         /* --- EVENT LISTENERS & INITIALIZATION --- */
         window.onload = function () {
             loadState();
-            initReelsGrid();
+            initReelsGrid(); renderScore();
             updateUI();
 
             // Enter Game Button
